@@ -4,11 +4,11 @@ import Modal from 'react-modal';
 import {jwtDecode} from 'jwt-decode';
 
 
-const AdminProfile = () => {
+const Profile = () => {
     const [user, setUser] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editUser, setEditUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('token') || '');
+    const [token] = useState(localStorage.getItem('token') || '');
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -74,7 +74,7 @@ const AdminProfile = () => {
                             <label className="block text-sm font-medium text-gray-700">Email</label>
                             <p className="mt-1 text-gray-900">{user.user_mail}</p>
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-4" style={{display:'none'}}>
                             <label className="block text-sm font-medium text-gray-700">Type</label>
                             <p className="mt-1 text-gray-900">{user.user_type}</p>
                         </div>
@@ -165,4 +165,4 @@ const AdminProfile = () => {
     );
 };
 
-export default AdminProfile;
+export default Profile;

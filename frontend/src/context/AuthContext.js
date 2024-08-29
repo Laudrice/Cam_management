@@ -14,15 +14,15 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
-                console.log('Decoded Token:', decodedToken);
-                console.log('Token Expiration Time (ms):', decodedToken.exp * 1000);
-                console.log('Current Time (ms):', Date.now());
+                // console.log('Decoded Token:', decodedToken);
+                // console.log('Token Expiration Time (ms):', decodedToken.exp * 1000);
+                // console.log('Current Time (ms):', Date.now());
                 
                 if (decodedToken.exp * 1000 > Date.now()) {
                     setIsAuthenticated(true);
                     setUser(decodedToken); 
-                    console.log('User information after decoding token:', decodedToken); 
-                    console.log('Token is valid, user is authenticated');
+                    // console.log('User information after decoding token:', decodedToken); 
+                    // console.log('Token is valid, user is authenticated');
                 } else {
                     localStorage.removeItem('token');
                     console.log('Token is expired, user is not authenticated');
@@ -36,19 +36,19 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = (token) => {
-        console.log('Login called with token:', token);
+        // console.log('Login called with token:', token);
         localStorage.setItem('token', token);
         const decodedToken = jwtDecode(token);
         setIsAuthenticated(true);
         setUser(decodedToken);
-        console.log('User information after login:', decodedToken);
+        // console.log('User information after login:', decodedToken);
     };
 
     const logout = () => {
         console.log('Logout called');
         localStorage.removeItem('token');
         setIsAuthenticated(false);
-        console.log('User information before logout:', user);
+        // console.log('User information before logout:', user);
         setUser(null); 
 
         fetch('/api/logout', {

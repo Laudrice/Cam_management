@@ -310,7 +310,7 @@ const UserManagement = () => {
                 >
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h2 className="text-2xl font-bold">Supprimer</h2>
+                            <h2 className="text-2xl font-bold">Information</h2>
                             <button onClick={closeDeleteModal} className="close-btn" style={{fontWeight:'800', color:'red'}}>&times;</button>
                         </div>
                         <hr />
@@ -320,7 +320,7 @@ const UserManagement = () => {
                                 <div className="flex" style={{alignItems:'center'}}>
                                     <FontAwesomeIcon icon={faCircleXmark} className="text-red-500 text-6xl mb-4" />
                                     <p className="block text-m font-medium text-gray-700 mb-4 ml-5">
-                                        Êtes-vous sûr de vouloir supprimer <b>{selectedUser.user_name}</b> ?
+                                        Êtes-vous sûr de vouloir supprimer <b style={{color:'red'}}>{selectedUser.user_name}</b> ?
                                     </p>
                                 </div>
                                 <hr />
@@ -422,7 +422,7 @@ const UserManagement = () => {
                     <div className="modal-content">
                         <div className="modal-header">
                             <h2 className="text-2xl font-bold">Information</h2>
-                            <button onClick={closeDeleteModal} className="close-btn" style={{fontWeight:'800', color:'red'}} >&times;</button>
+                            <button onClick={closeSuccessModal} className="close-btn" style={{fontWeight:'800', color:'red'}} >&times;</button>
                         </div>
                         <hr />
                         <br />

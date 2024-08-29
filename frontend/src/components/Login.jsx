@@ -14,7 +14,7 @@ const Login = () => {
         try {
             const response = await axios.post('/users/login', { user_mail: email, user_pwd: password });
             login(response.data.token);
-            navigate('/user-management');
+            navigate('/users');
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 window.alert('Email ou mot de passe incorrect');

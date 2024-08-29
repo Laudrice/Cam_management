@@ -4,7 +4,6 @@ import Modal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
-
 const CameraManagement = () => {
     const [cams, setCams] = useState([]);
     const [selectedCam, setSelectedCam] = useState(null);
@@ -16,11 +15,10 @@ const CameraManagement = () => {
     const [entries, setEntries] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [newCam, setNewCam] = useState({
-        cam_name: '',
-        cam_IP: '',
-        cam_canal: '',
-        cam_protocol: '',
-        cam_port:'',
+        name: '',
+        enabled: true,
+        transport: '',
+        nom_: '',
     });
 
     useEffect(() => {
@@ -36,8 +34,8 @@ const CameraManagement = () => {
     }, []);
 
     const filteredCams = cams.filter(cam =>
-        cam.cam_name.toLowerCase().includes(search.toLowerCase()) ||
-        cam.user_mail.toLowerCase().includes(search.toLowerCase()) 
+        cam.name.toLowerCase().includes(search.toLowerCase()) ||
+        cam.nom_.toLowerCase().includes(search.toLowerCase())
     );
 
     const paginatedCams = filteredCams.slice(
@@ -74,11 +72,10 @@ const CameraManagement = () => {
     const closeAddModal = () => {
         setIsAddModalOpen(false);
         setNewCam({
-            cam_name: '',
-            cam_IP: '',
-            cam_canal: '',
-            cam_protocol: '',
-            cam_port:'',
+            name: '',
+            enabled: true,
+            transport: '',
+            nom_: '',
         });
     };
 
@@ -145,6 +142,7 @@ const CameraManagement = () => {
                     <button
                         onClick={openAddModal}
                         className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+                        style={{display:'none'}}
                     >
                         Ajouter une camera
                     </button>
@@ -178,22 +176,19 @@ const CameraManagement = () => {
                         <tr>
                             <th className="border border-gray-300 p-2">ID</th>
                             <th className="border border-gray-300 p-2">Nom</th>
-                            <th className="border border-gray-300 p-2">IP</th>
-                            <th className="border border-gray-300 p-2">Canal</th>
-                            <th className="border border-gray-300 p-2">Protocol</th>
-                            <th className="border border-gray-300 p-2">Port</th>
+                            <th className="border border-gray-300 p-2">Transport</th>
+                            <th className="border border-gray-300 p-2">Enabled</th>
+                            <th className="border border-gray-300 p-2">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {paginatedCams.map(cam => (
                             <tr key={cam.id}>
                                 <td className="border border-gray-300 p-2" style={{ width: '75px', textAlign:'center' }}>{cam.id}</td>
-                                <td className="border border-gray-300 p-2" style={{ width: '180px', textAlign:'center' }}>{cam.cam_name}</td>
-                                <td className="border border-gray-300 p-2">{cam.cam_IP}</td>
-                                <td className="border border-gray-300 p-2" style={{ width: '180px', textAlign:'center' }}>{cam.cam_canal}</td>
-                                <td className="border border-gray-300 p-2" style={{ width: '180px', textAlign:'center' }}>{cam.cam_protocol}</td>
-                                <td className="border border-gray-300 p-2" style={{ width: '180px', textAlign:'center' }}>{cam.cam_port}</td>
-                                <td className="border border-gray-300 p-2" style={{ width: '225px' }}>
+                                <td className="border border-gray-300 p-2" style={{ width: '300px', textAlign:'center' }}>{cam.nom_}</td>
+                                <td className="border border-gray-300 p-2" style={{ width: '180px', textAlign:'center' }}>{cam.transport}</td>
+                                <td className="border border-gray-300 p-2" style={{ width: '100px', textAlign:'center' }}>{cam.enabled ? 'Oui' : 'Non'}</td>
+                                <td className="border border-gray-300 p-2" style={{ width: '275px' }}>
                                     <button
                                         onClick={() => openEditModal(cam)}
                                         className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
@@ -248,82 +243,46 @@ const CameraManagement = () => {
                         </div>
                         <hr />
                         <br />
-                        {selectedCam && (
-                            <form onSubmit={handleEditSubmit}>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700">Nom</label>
-                                    <input
-                                        type="text"
-                                        name="cam_name"
-                                        value={selectedCam.cam_name}
-                                        onChange={handleEditChange}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700">IP</label>
-                                    <input
-                                        type="text"
-                                        name="cam_IP"
-                                        value={selectedCam.cam_IP}
-                                        onChange={handleEditChange}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700">Canal</label>
-                                    <input
-                                        type="text"
-                                        name="cam_canal"
-                                        value={selectedCam.cam_canal}
-                                        onChange={handleEditChange}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700">Protocol</label>
-                                    <input
-                                        type="text"
-                                        name="cam_protocol"
-                                        value={selectedCam.cam_protocol}
-                                        onChange={handleEditChange}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700">Port</label>
-                                    <input
-                                        type="text"
-                                        name="cam_port"
-                                        value={selectedCam.cam_port}
-                                        onChange={handleEditChange}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        required
-                                    />
-                                </div>
-
-                                <hr />
-                                <br />
-                                <div className="modal-footer">
-                                    <button
-                                        type="submit"
-                                        className="bg-green-500 text-white px-4 py-2 rounded"
-                                    >
-                                        Sauvegarder
-                                    </button>
-                                    <button
-                                        onClick={closeEditModal}
-                                        className="bg-gray-500 text-white px-4 py-2 rounded"
-                                    >
-                                        Annuler
-                                    </button>
-                                </div>
-                            </form>
-                        )}
+                        <form onSubmit={handleEditSubmit}>
+                            <div className="mb-4">
+                                <label htmlFor="name" className="block text-sm font-medium">Identifiant dans le NVR:</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value={selectedCam?.name || ''}
+                                    onChange={handleEditChange}
+                                    className="border border-gray-300 rounded-md p-2 w-full"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="nom_" className="block text-sm font-medium">Nom Alternative:</label>
+                                <input
+                                    type="text"
+                                    id="nom_"
+                                    name="nom_"
+                                    value={selectedCam?.nom_ || ''}
+                                    onChange={handleEditChange}
+                                    className="border border-gray-300 rounded-md p-2 w-full"
+                                    required
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label htmlFor="transport" className="block text-sm font-medium">Transport:</label>
+                                <input
+                                    type="text"
+                                    id="transport"
+                                    name="transport"
+                                    value={selectedCam?.transport || ''}
+                                    onChange={handleEditChange}
+                                    className="border border-gray-300 rounded-md p-2 w-full"
+                                    readOnly
+                                />
+                            </div>
+                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mr-2">Sauvegarder</button>
+                            <button onClick={closeEditModal} className="bg-gray-500 text-white px-4 py-2 rounded">Annuler</button>
+                        </form>
                     </div>
                 </Modal>
 
@@ -341,30 +300,9 @@ const CameraManagement = () => {
                         </div>
                         <hr />
                         <br />
-                        {selectedCam && (
-                            <div className="">
-                                <div className="flex" style={{alignItems:'center'}}>
-                                    <FontAwesomeIcon icon={faCircleXmark} className="text-red-500 text-6xl mb-4" />
-                                    <p className="block text-m font-medium text-gray-700 mb-4 ml-5">
-                                        Êtes-vous sûr de vouloir supprimer <b>{selectedCam.cam_name}</b> ?
-                                    </p>
-                                </div>
-                                <hr />
-                                <br />
-                                <button
-                                    onClick={handleDeleteSubmit}
-                                    className="bg-red-500 text-white px-4 py-2 rounded mr-2 float-end"
-                                >
-                                    Supprimer
-                                </button>
-                                <button
-                                    onClick={closeDeleteModal}
-                                    className="bg-gray-500 text-white px-4 py-2 rounded float-right mr-2"
-                                >
-                                    Annuler
-                                </button>
-                            </div>
-                        )}
+                        <p>Êtes-vous sûr de vouloir supprimer la caméra <strong>{selectedCam?.name}</strong> ?</p>
+                        <button onClick={handleDeleteSubmit} className="bg-red-500 text-white px-4 py-2 rounded mr-2">Supprimer</button>
+                        <button onClick={closeDeleteModal} className="bg-gray-500 text-white px-4 py-2 rounded">Annuler</button>
                     </div>
                 </Modal>
 
@@ -377,87 +315,64 @@ const CameraManagement = () => {
                 >
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h2 className="text-2xl font-bold text-center">Ajout</h2>
+                            <h2 className="text-2xl font-bold">Ajouter</h2>
                             <button onClick={closeAddModal} className="close-btn" style={{fontWeight:'800', color:'red'}}>&times;</button>
                         </div>
                         <hr />
                         <br />
                         <form onSubmit={handleAddSubmit}>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Nom</label>
+                                <label htmlFor="name" className="block text-sm font-medium">Nom:</label>
                                 <input
                                     type="text"
-                                    name="cam_name"
-                                    value={newCam.cam_name}
+                                    id="name"
+                                    name="name"
+                                    value={newCam.name}
                                     onChange={handleAddChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                    className="border border-gray-300 rounded-md p-2 w-full"
                                     required
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">IP</label>
+                                <label htmlFor="nom_" className="block text-sm font-medium">Nom Alternative:</label>
                                 <input
                                     type="text"
-                                    name="cam_IP"
-                                    value={newCam.cam_IP}
+                                    id="nom_"
+                                    name="nom_"
+                                    value={newCam.nom_}
                                     onChange={handleAddChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                    className="border border-gray-300 rounded-md p-2 w-full"
                                     required
                                 />
                             </div>
-                            
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Canal</label>
+                                <label htmlFor="transport" className="block text-sm font-medium">Transport:</label>
                                 <input
                                     type="text"
-                                    name="cam_canal"
-                                    value={newCam.cam_canal}
+                                    id="transport"
+                                    name="transport"
+                                    value={newCam.transport}
                                     onChange={handleAddChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                    className="border border-gray-300 rounded-md p-2 w-full"
                                     required
                                 />
                             </div>
-                            
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Protocol</label>
-                                <input
-                                    type="text"
-                                    name="cam_protocol"
-                                    value={newCam.cam_protocol}
+                                <label htmlFor="enabled" className="block text-sm font-medium">Enabled:</label>
+                                <select
+                                    id="enabled"
+                                    name="enabled"
+                                    value={newCam.enabled ? 'true' : 'false'}
                                     onChange={handleAddChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                    className="border border-gray-300 rounded-md p-2 w-full"
                                     required
-                                />
-                            </div>
-                            
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Port</label>
-                                <input
-                                    type="text"
-                                    name="cam_port"
-                                    value={newCam.cam_port}
-                                    onChange={handleAddChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                    required
-                                />
-                            </div>
-                            
-                            <hr />
-                            <br />
-                            <div className="modal-footer">
-                                <button
-                                    type="submit"
-                                    className="bg-green-500 text-white px-4 py-2 rounded"
                                 >
-                                    Ajouter
-                                </button>
-                                <button
-                                    onClick={closeAddModal}
-                                    className="bg-gray-500 text-white px-4 py-2 rounded"
-                                >
-                                    Annuler
-                                </button>
+                                    <option value="true">Oui</option>
+                                    <option value="false">Non</option>
+                                </select>
                             </div>
+                            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mr-2">Ajouter</button>
+                            <button onClick={closeAddModal} className="bg-gray-500 text-white px-4 py-2 rounded">Annuler</button>
                         </form>
                     </div>
                 </Modal>
@@ -471,27 +386,13 @@ const CameraManagement = () => {
                 >
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h2 className="text-2xl font-bold">Information</h2>
-                            <button onClick={closeDeleteModal} className="close-btn" style={{fontWeight:'800', color:'red'}} >&times;</button>
+                            <h2 className="text-2xl font-bold">Succès</h2>
+                            <button onClick={closeSuccessModal} className="close-btn" style={{fontWeight:'800', color:'red'}}>&times;</button>
                         </div>
                         <hr />
                         <br />
-                            <div className="">
-                                <div className="flex" style={{alignItems:'center'}}>
-                                    <FontAwesomeIcon icon={faCircleCheck} className="text-green-500 text-6xl mb-4" />
-                                    <p className="block text-m font-medium text-gray-700 mb-4 ml-5">
-                                        Opération réussi
-                                    </p>
-                                </div>
-                                <hr />
-                                <br />
-                                <button
-                                    onClick={closeSuccessModal}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded float-right mr-2"
-                                >
-                                    Fermer
-                                </button>
-                            </div>
+                        <p>Opération réussie !</p>
+                        <button onClick={closeSuccessModal} className="bg-gray-500 text-white px-4 py-2 rounded">Fermer</button>
                     </div>
                 </Modal>
             </div>

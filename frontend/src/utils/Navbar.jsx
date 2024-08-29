@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faUser, faSignOutAlt, faTimes, faBars } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom'; // Import de Link
+import { faUser, faSignOutAlt, faTimes, faBars,faVideo } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from '../context/AuthContext';
 
 const Navbar = () => {
@@ -23,16 +23,18 @@ const Navbar = () => {
         <header className="bg-green-700 text-white p-3">
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo à gauche */}
-                <div className="text-2xl font-bold">
-                    <FontAwesomeIcon icon={faHome} />
+                <div className="text-2xl font-bold flex" style={{alignContent:'center', alignItems:'center'}}>
+                    <p className='mr-4'>Camera</p>
+                    <FontAwesomeIcon icon={faVideo} className='mt-1' />
                 </div>
 
                 {/* Liste de menu au centre */}
                 <nav className={`hidden md:flex space-x-4`}>
                     <Link to="/" className="hover:bg-green-600 px-3 py-2 rounded">Accueil</Link>
-                    <Link to="/user-management" className="hover:bg-green-600 px-3 py-2 rounded">Utilisateurs</Link>
+                    <Link to="/users" className="hover:bg-green-600 px-3 py-2 rounded">Utilisateurs</Link>
                     <Link to="/cameras" className="hover:bg-green-600 px-3 py-2 rounded">Caméras</Link>
-                    <Link to="/events" className="hover:bg-green-600 px-3 py-2 rounded">Evènements</Link>
+                    <Link to="/events" className="hover:bg-green-600 px-3 py-2 rounded">Vidéos</Link>
+                    <Link to="/videos" className="hover:bg-green-600 px-3 py-2 rounded">Stream</Link>
                 </nav>
 
                 {/* Logo de profil à droite */}
@@ -66,9 +68,10 @@ const Navbar = () => {
                     </button>
                     <nav className="mt-4 space-y-2">
                         <Link to="/" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Accueil</Link>
-                        <Link to="/user-management" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Utilisateurs</Link>
+                        <Link to="/users" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Utilisateurs</Link>
                         <Link to="/cameras" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Caméras</Link>
-                        <Link to="/events" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Evènements</Link>
+                        <Link to="/events" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Vidéos</Link>
+                        <Link to="/videos" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Stream</Link>
                         <hr />
                         {isAuthenticated && (
                             <div className="mt-4">
