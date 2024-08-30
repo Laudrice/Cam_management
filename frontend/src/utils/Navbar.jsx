@@ -70,8 +70,8 @@ const Navbar = () => {
                         <Link to="/" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Accueil</Link>
                         <Link to="/users" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Utilisateurs</Link>
                         <Link to="/cameras" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Caméras</Link>
-                        <Link to="/events" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Vidéos</Link>
                         <Link to="/videos" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Stream</Link>
+                        <Link to="/events" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Vidéos</Link>
                         <hr />
                         {isAuthenticated && (
                             <div className="mt-4">

@@ -386,13 +386,27 @@ const CameraManagement = () => {
                 >
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h2 className="text-2xl font-bold">Succès</h2>
-                            <button onClick={closeSuccessModal} className="close-btn" style={{fontWeight:'800', color:'red'}}>&times;</button>
+                            <h2 className="text-2xl font-bold">Information</h2>
+                            <button onClick={closeSuccessModal} className="close-btn" style={{fontWeight:'800', color:'red'}} >&times;</button>
                         </div>
                         <hr />
                         <br />
-                        <p>Opération réussie !</p>
-                        <button onClick={closeSuccessModal} className="bg-gray-500 text-white px-4 py-2 rounded">Fermer</button>
+                            <div className="">
+                                <div className="flex" style={{alignItems:'center'}}>
+                                    <FontAwesomeIcon icon={faCircleCheck} className="text-green-500 text-6xl mb-4" />
+                                    <p className="block text-m font-medium text-gray-700 mb-4 ml-5">
+                                        Opération réussi
+                                    </p>
+                                </div>
+                                <hr />
+                                <br />
+                                <button
+                                    onClick={closeSuccessModal}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded float-right mr-2"
+                                >
+                                    Fermer
+                                </button>
+                            </div>
                     </div>
                 </Modal>
             </div>
