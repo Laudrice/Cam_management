@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { authenticateToken, loginUser } = require('./controllers/userController');
-const { syncNVRWithDatabase } = require('./controllers/camController');
+const { syncNVRWithDatabase, formatRTSPDate, getVideoDuration } = require('./controllers/camController');
 const axiosDigestAuth = require('@mhoc/axios-digest-auth').default;
 const xml2js = require('xml2js');
 const ffmpeg = require('fluent-ffmpeg');
@@ -12,7 +12,6 @@ const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const moment = require('moment');
-const { formatRTSPDate, getVideoDuration } = require('./controllers/camController');
 
 const app = express();
 
