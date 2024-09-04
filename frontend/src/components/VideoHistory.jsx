@@ -9,49 +9,68 @@ const VideoHistory = ({ channelId }) => {
 
     const handleStreamVideo = async () => {
         setError('');
+        if (new Date(startTime) > new Date(endTime)) {
+            setError('La date de début ne peut pas être après la date de fin.');
+            return;
+        }
+
         const streamUrl = `http://10.4.105.29:8080/video-history/${channelId}?startTime=${startTime}&endTime=${endTime}`;
-        
+
         try {
             const response = await fetch(streamUrl);
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch video');
+                throw new Error(errorData.error || 'Échec de la récupération de la vidéo');
             }
             setVideoUrl(streamUrl);
         } catch (err) {
-            console.error('Error fetching video:', err);
+            console.error('Erreur lors de la récupération de la vidéo:', err);
             setError(err.message);
             setVideoUrl('');
         }
     };
 
     return (
-        <div>
-            <h4>Video History</h4>
-            <div>
-                <label>Start Time: </label>
+        <div className="video-history-container">
+            <h4 className="text-xl font-bold mb-4">Informations</h4>
+                <div className="flex" style={{width:'98%',}}>
+            <div className="input-group mb-4">
+                <label htmlFor="startTime" className="block mb-2">Heure de début:</label>
                 <input
+                    id="startTime"
                     type="datetime-local"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
+                    className="border border-gray-300 p-2 rounded-md w-full"
                 />
             </div>
-            <div>
-                <label>End Time: </label>
+            <div className="input-group mb-4" style={{marginLeft:'50px'}}>
+                <label htmlFor="endTime" className="block mb-2">Heure de fin:</label>
                 <input
+                    id="endTime"
                     type="datetime-local"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
+                    className="border border-gray-300 p-2 rounded-md w-full"
                 />
             </div>
-            <button onClick={handleStreamVideo}>Stream Video</button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+                </div>
+            <button
+                onClick={handleStreamVideo}
+                className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+            >
+                Voir la vidéo
+            </button>
+            <br />
+            {error && <p className="text-red-500 mt-4">{error}</p>}
             {videoUrl && !error && (
-                <div>
-                    <h5>Video Player</h5>
-                    <video controls width="600">
+                <div className="video-player mt-4">
+                    <br />
+                    <hr />
+                    <br />
+                    <video controls style={{ width: '100%', borderRadius:'1rem', border:'1px solid grey' }}>
                         <source src={videoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
+                        Votre navigateur ne supporte pas la balise vidéo.
                     </video>
                 </div>
             )}
