@@ -35,7 +35,7 @@ const syncNVRWithDatabase = async () => {
 
                 streamingChannels.forEach(channel => {
                     const id = channel.id[0];
-                    const baseId = id.slice(0, -1); // Retirer le dernier chiffre
+                    const baseId = id.slice(0, -1);
 
                     if (!uniqueCameras.has(baseId)) {
                         uniqueCameras.set(baseId, {

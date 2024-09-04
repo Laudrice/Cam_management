@@ -247,7 +247,7 @@ app.get('/video-history/:channelId', async (req, res) => {
         '-vcodec', 'libx264',
         '-preset', 'ultrafast',
         '-tune', 'zerolatency',
-        '-an', // Désactiver l'audio
+        '-an',
         '-movflags', 'frag_keyframe+empty_moov+default_base_moof',
         '-bufsize', '500k',
         '-f', 'mp4',
