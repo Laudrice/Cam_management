@@ -49,6 +49,9 @@ const syncNVRWithDatabase = async () => {
 
                 const t = await db.sequelize.transaction();
                 try {
+                    // Mettre toutes les caméras sur inactif
+                    await db.cams.update({ enabled: 'false' }, { where: {}, transaction: t });
+
                     const existingCams = await db.cams.findAll({ transaction: t });
                     const existingCamIds = new Set(existingCams.map(cam => cam.id));
 
@@ -89,9 +92,11 @@ const syncNVRWithDatabase = async () => {
     }
 };
 
+
 // Récupérer toutes les caméras
 const getAllCams = async (req, res) => {
     try {
+        syncNVRWithDatabase
         let cams = await Cam.findAll({});
         res.status(200).send(cams);
     } catch (error) {

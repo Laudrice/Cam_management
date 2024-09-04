@@ -177,7 +177,7 @@ const CameraManagement = () => {
                             <th className="border border-gray-300 p-2">ID</th>
                             <th className="border border-gray-300 p-2">Nom</th>
                             <th className="border border-gray-300 p-2">Transport</th>
-                            <th className="border border-gray-300 p-2">Enabled</th>
+                            <th className="border border-gray-300 p-2">Actif</th>
                             <th className="border border-gray-300 p-2">Actions</th>
                         </tr>
                     </thead>
