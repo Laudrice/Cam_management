@@ -8,8 +8,9 @@ import Profile from './components/Profile';
 import Home from './components/Home';
 import CameraManagement from './components/CameraManagement';
 import EventList from './components/EventList';
-import VideoPage from './components/VideoPage';
+import VideoHistory from './components/VideoHistory';
 import CameraList from './components/CameraList';
+import VideoHistoryPage from './components/VideoHistoryPage';
 
 const App = () => {
 
@@ -51,7 +52,7 @@ const App = () => {
                 <Route path="/users" element={<ProtectedRoute component={UserManagement} />} />
                 <Route path="/profile" element={<ProtectedRoute component={Profile} />} />
                 <Route path="/cameras" element={<ProtectedRoute component={CameraManagement} />} />
-                <Route path="/events" element={<ProtectedRoute component={EventList} />} />
+                <Route path="/history" element={<ProtectedRoute component={VideoHistoryPage} />} />
                 <Route path="/videos" element={<ProtectedRoute component={CameraList} />} />
                 <Route path="/" element={<ProtectedRoute component={Home} />} />
             </Routes>
