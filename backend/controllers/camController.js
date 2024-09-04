@@ -1,3 +1,4 @@
+require('dotenv').config();  
 const axiosDigestAuth = require('@mhoc/axios-digest-auth').default;
 const xml2js = require('xml2js');
 const ffmpeg = require('fluent-ffmpeg');
@@ -6,8 +7,8 @@ const db = require('../models/index');
 
 // Création d'une instance pour l'authentification Digest
 const digestAuth = new axiosDigestAuth({
-    username: 'admin',
-    password: 'CamAdmin2023'
+    username: process.env.RTSP_USERNAME,
+    password: process.env.RTSP_PASSWORD
 });
 
 // Modèle Cam
@@ -17,7 +18,7 @@ const Cam = db.cams;
 const syncNVRWithDatabase = async () => {
     try {
         const response = await digestAuth.request({
-            url: 'http://10.4.105.108:80/ISAPI/Streaming/channels',
+            url: `http://${process.env.RTSP_HOST}:80/ISAPI/Streaming/channels`,
             method: 'GET'
         });
 
@@ -147,7 +148,7 @@ const deleteCam = async (req, res) => {
 // Streaming de la vidéo (low quality)
 const streamLowQuality = (req, res) => {
     const channelId = req.params.channelId;
-    const rtspUrl = `rtsp://admin:CamAdmin2023@10.4.105.108:554/ISAPI/Streaming/channels/${channelId}`;
+    const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/Streaming/channels/${channelId}`;
 
     res.writeHead(200, {
         'Content-Type': 'video/mp4',
@@ -187,7 +188,7 @@ const streamLowQuality = (req, res) => {
 // Streaming de la vidéo (high quality)
 const streamHighQuality = (req, res) => {
     const channelId = req.params.channelId;
-    const rtspUrl = `rtsp://admin:CamAdmin2023@10.4.105.108:554/ISAPI/Streaming/channels/${channelId}`;
+    const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/Streaming/channels/${channelId}`;
 
     res.writeHead(200, {
         'Content-Type': 'video/mp4',
@@ -223,7 +224,7 @@ const streamHighQuality = (req, res) => {
     });
 };
 
-//Entre deux dates
+// Entre deux dates
 function formatRTSPDate(dateString) {
     const date = new Date(dateString);
     return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');

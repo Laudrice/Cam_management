@@ -1,4 +1,5 @@
-//server.js
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const { authenticateToken, loginUser } = require('./controllers/userController');
@@ -12,8 +13,6 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 const moment = require('moment');
 const { formatRTSPDate, getVideoDuration } = require('./controllers/camController');
-
-
 
 const app = express();
 
@@ -29,8 +28,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const digestAuth = new axiosDigestAuth({
-    username: 'admin',
-    password: 'CamAdmin2023'
+    username: process.env.RTSP_USERNAME,
+    password: process.env.RTSP_PASSWORD
 });
 
 // Route login
@@ -44,34 +43,33 @@ app.use('/api/users', authenticateToken, user_router);
 const cam_router = require('./routes/camRouter.js');
 app.use('/api/cams', cam_router);
 
-
 // Test API
 app.get('/', (req, res) => {
     res.json({ message: 'Test API' });
 });
 syncNVRWithDatabase();
+
 // PORT serveur
 const PORT = process.env.PORT || 8080;
 
-//Récupération de tous les caméras 
+// Récupération de tous les caméras 
 app.get('/cameras', async (req, res) => {
     try {
         const response = await digestAuth.request({
-            url: 'http://10.4.105.108:80/ISAPI/Streaming/channels',
+            url: `http://${process.env.RTSP_HOST}:80/ISAPI/Streaming/channels`,
             method: 'GET'
         });
 
-        console.log('Response data:', response.data); // Ajoutez ce log
+        console.log('Response data:', response.data);
 
         xml2js.parseString(response.data, (err, result) => {
             if (err) {
-                console.error('XML Parsing Error:', err); // Améliorez la gestion des erreurs
+                console.error('XML Parsing Error:', err);
                 return res.status(500).json({
                     status: 'error',
                     message: 'Failed to parse XML'
                 });
             }
-            //Récupération de tous les Canaux actifs 
             const streamingChannels = result['StreamingChannelList'] && result['StreamingChannelList']['StreamingChannel'];
             
             if (Array.isArray(streamingChannels)) {
@@ -90,7 +88,6 @@ app.get('/cameras', async (req, res) => {
                         });
                     }
                 });
-                //Resultat en JSON 
                 return res.json({
                     status: 'success',
                     data: Array.from(uniqueCameras.values())
@@ -112,12 +109,10 @@ app.get('/cameras', async (req, res) => {
     }
 });
 
-
 // Route pour le streaming en basse qualité
 app.get('/stream-lowest/:channelId', (req, res) => {
     const channelId = req.params.channelId;
-    //URL du flux vidéo
-    const rtspUrl = `rtsp://admin:CamAdmin2023@10.4.105.108:554/ISAPI/Streaming/channels/${channelId}`;
+    const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/Streaming/channels/${channelId}`;
 
     res.writeHead(200, {
         'Content-Type': 'video/mp4',
@@ -154,11 +149,10 @@ app.get('/stream-lowest/:channelId', (req, res) => {
     });
 });
 
-
-//Route pour le streaming de haute qualité
+// Route pour le streaming de haute qualité
 app.get('/stream-high/:channelId', (req, res) => {
     const channelId = req.params.channelId;
-    const rtspUrl = `rtsp://admin:CamAdmin2023@10.4.105.108:554/ISAPI/Streaming/channels/${channelId}`;
+    const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/Streaming/channels/${channelId}`;
 
     res.writeHead(200, {
         'Content-Type': 'video/mp4',
@@ -229,7 +223,7 @@ app.get('/video-history/:channelId', async (req, res) => {
     const formattedStartTime = formatRTSPDate(adjustedStartTime);
     const formattedEndTime = formatRTSPDate(adjustedEndTime);
 
-    const rtspUrl = `rtsp://admin:CamAdmin2023@10.4.105.108:554/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
+    const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
     console.log(`Requesting video from: ${rtspUrl}`);
 
     try {
@@ -277,7 +271,6 @@ app.get('/video-history/:channelId', async (req, res) => {
         ffmpegProcess.kill('SIGINT');
     });
 });
-
 
 // Démarrer le serveur
 app.listen(PORT, () => {
