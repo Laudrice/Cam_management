@@ -1,15 +1,18 @@
+require('dotenv').config();
 const axiosDigestAuth = require('@mhoc/axios-digest-auth').default;
 const xml2js = require('xml2js');
+
+// Création d'une instance pour l'authentification Digest
 const digestAuth = new axiosDigestAuth({
-    username: 'admin', // Remplace par tes identifiants
-    password: 'CamAdmin2023'
+    username: process.env.RTSP_USERNAME,
+    password: process.env.RTSP_PASSWORD
 });
 
 // Fonction pour obtenir la liste des événements
 const getEventList = async (req, res) => {
     try {
         const response = await digestAuth.request({
-            url: 'http://10.4.105.108:80/ISAPI/Event/triggers',
+            url: `http://${process.env.NVR_HOST}:${process.env.NVR_PORT}/ISAPI/Event/triggers`, // URL construite avec les variables d'environnement
             method: 'GET'
         });
 
@@ -37,7 +40,7 @@ const getEventVideos = async (req, res) => {
     const { eventId } = req.params;
     try {
         const response = await digestAuth.request({
-            url: `http://10.4.105.108:80/ISAPI/ContentMgmt/search?eventId=${eventId}`, // URL pour récupérer les vidéos
+            url: `http://${process.env.NVR_HOST}:${process.env.NVR_PORT}/ISAPI/ContentMgmt/search?eventId=${eventId}`, // URL pour récupérer les vidéos
             method: 'GET'
         });
 
