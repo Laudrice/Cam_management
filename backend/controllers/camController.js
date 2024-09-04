@@ -24,7 +24,7 @@ const syncNVRWithDatabase = async () => {
 
         xml2js.parseString(response.data, async (err, result) => {
             if (err) {
-                console.error('Failed to parse XML:', err);
+                console.error('parse XML erreur:', err);
                 return;
             }
 
@@ -77,18 +77,18 @@ const syncNVRWithDatabase = async () => {
                     }
 
                     await t.commit();
-                    console.log('Database sync successful');
+                    console.log('Synchronisation à la base réussi');
                 } catch (dbError) {
                     await t.rollback();
-                    console.error('Database sync failed:', dbError);
+                    console.error('Erreur de synchronisation:', dbError);
                 }
             } else {
-                console.log('No streaming channels found');
+                console.log('Aucun stream détécté');
             }
         });
 
     } catch (error) {
-        console.error('Error fetching data from NVR:', error);
+        console.error('Erreur de la récupération depuis le NVR:', error);
     }
 };
 

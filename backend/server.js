@@ -201,7 +201,7 @@ async function getVideoResolution(rtspUrl) {
                         height: videoStream.height
                     });
                 } else {
-                    reject(new Error('No video stream found'));
+                    reject(new Error('Aucun stream détécté'));
                 }
             }
         });
@@ -213,7 +213,7 @@ app.get('/video-history/:channelId', async (req, res) => {
     const { startTime, endTime } = req.query;
 
     if (!startTime || !endTime) {
-        return res.status(400).json({ error: 'Start time and end time are required' });
+        return res.status(400).json({ error: 'Date obligatoire' });
     }
 
     const adjustedStartTime = new Date(new Date(startTime).getTime() + 2 * 60 * 60 * 1000);
@@ -223,14 +223,14 @@ app.get('/video-history/:channelId', async (req, res) => {
     const formattedEndTime = formatRTSPDate(adjustedEndTime);
 
     const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
-    console.log(`Requesting video from: ${rtspUrl}`);
+    console.log(`Requête: ${rtspUrl}`);
 
     try {
         const duration = await getVideoDuration(rtspUrl);
-        console.log(`Video duration: ${duration} seconds`);
+        console.log(`Durée de la vidéo: ${duration} seconds`);
     } catch (error) {
-        console.error(`Error checking video: ${error.message}`);
-        return res.status(500).json({ error: 'Error checking video availability' });
+        console.error(`Cidéo introuvable: ${error.message}`);
+        return res.status(500).json({ error: 'Vidéo introuvable' });
     }
 
     res.writeHead(200, {
@@ -273,5 +273,5 @@ app.get('/video-history/:channelId', async (req, res) => {
 
 // Démarrer le serveur
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Serveur actif sur le port ${PORT}`);
 });
