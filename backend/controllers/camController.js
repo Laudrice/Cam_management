@@ -229,12 +229,13 @@ const streamHighQuality = (req, res) => {
     });
 };
 
-// Entre deux dates
+// Conversion de la date pour qu'elle soit du format accépté par le NVR
 function formatRTSPDate(dateString) {
     const date = new Date(dateString);
     return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 }
 
+// Récupération de la résolution d'un vidéo d'un caméra
 async function getVideoResolution(rtspUrl) {
     return new Promise((resolve, reject) => {
         ffmpeg.ffprobe(rtspUrl, (err, metadata) => {
@@ -251,6 +252,8 @@ async function getVideoResolution(rtspUrl) {
     });
 }
 
+
+// Récupération de la durrée de vidéo entre deux dates
 function getVideoDuration(rtspUrl) {
     return new Promise((resolve, reject) => {
         const ffprobeProcess = spawn('ffprobe', [
