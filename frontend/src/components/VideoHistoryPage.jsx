@@ -67,7 +67,7 @@ const VideoHistoryPage = () => {
                 {selectedCamera && (
                     <div style={{ marginTop: '20px' }}>
                         <VideoHistory
-                            key={selectedCamera} // Ajouter la clé unique basée sur la caméra sélectionnée
+                            key={selectedCamera}
                             channelId={selectedCamera}
                             cameraName={cameraName}
                         />

@@ -177,7 +177,6 @@ const CameraManagement = () => {
                             <th className="border border-gray-300 p-2">ID</th>
                             <th className="border border-gray-300 p-2">Nom</th>
                             <th className="border border-gray-300 p-2">Transport</th>
-                            <th className="border border-gray-300 p-2">Actif</th>
                             <th className="border border-gray-300 p-2">Actions</th>
                         </tr>
                     </thead>
@@ -187,7 +186,6 @@ const CameraManagement = () => {
                                 <td className="border border-gray-300 p-2" style={{ width: '75px', textAlign:'center' }}>{cam.id}</td>
                                 <td className="border border-gray-300 p-2" style={{ width: '300px', textAlign:'center' }}>{cam.nom_}</td>
                                 <td className="border border-gray-300 p-2" style={{ width: '180px', textAlign:'center' }}>{cam.transport}</td>
-                                <td className="border border-gray-300 p-2" style={{ width: '100px', textAlign:'center' }}>{cam.enabled ? 'Oui' : 'Non'}</td>
                                 <td className="border border-gray-300 p-2" style={{ width: '275px' }}>
                                     <button
                                         onClick={() => openEditModal(cam)}
