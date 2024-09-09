@@ -271,6 +271,72 @@ app.get('/video-history/:channelId', async (req, res) => {
     });
 });
 
+const { promisify } = require('util');
+
+app.get('/save-video/:channelId', async (req, res) => {
+    const { channelId } = req.params;
+    const { startTime, endTime } = req.query;
+
+    if (!startTime || !endTime) {
+        return res.status(400).json({ error: 'Date obligatoire' });
+    }
+
+    const adjustedStartTime = new Date(new Date(startTime).getTime() + 2 * 60 * 60 * 1000);
+    const adjustedEndTime = new Date(new Date(endTime).getTime() + 2 * 60 * 60 * 1000);
+
+    const formattedStartTime = formatRTSPDate(adjustedStartTime);
+    const formattedEndTime = formatRTSPDate(adjustedEndTime);
+
+    const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
+    console.log(`Requête: ${rtspUrl}`);
+
+    // Chemin du répertoire sous Windows avec barres obliques inverses échappées
+    const outputDir = path.join('C:', 'Users', 'Freddy', 'Downloads', 'Vidéo de surveillance');
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    const outputFilePath = path.join(outputDir, `video_${channelId}_${formattedStartTime}_${formattedEndTime}.mp4`);
+    
+    const ffmpegProcess = ffmpeg(rtspUrl)
+        .setFfmpegPath(ffmpegPath)
+        .outputOptions('-c:v', 'libx264')  // Convertir en H.264
+        .outputOptions('-preset', 'ultrafast')  // Vitesse rapide
+        .outputOptions('-tune', 'zerolatency')  // Faible latence
+        .outputOptions('-an')  // Pas d'audio
+        .outputOptions('-movflags', 'frag_keyframe+empty_moov+default_base_moof')  // Permet la lecture progressive
+        .outputOptions('-bufsize', '500k')  // Réglage du buffer
+        .save(outputFilePath);
+
+    const waitForEnd = () => new Promise((resolve, reject) => {
+        ffmpegProcess
+            .on('end', () => {
+                console.log('Vidéo enregistrée avec succès');
+                resolve();
+            })
+            .on('stderr', (stderrLine) => {
+                console.error('FFmpeg stderr:', stderrLine);
+            })
+            .on('error', (err) => {
+                console.error('Erreur lors de la sauvegarde de la vidéo:', err.message);
+                reject(err);
+            });
+    });
+
+    try {
+        await waitForEnd();
+
+        // Vérifier que le fichier existe et est accessible
+        await promisify(fs.access)(outputFilePath, fs.constants.R_OK);
+
+        res.status(200).json({ message: 'Vidéo sauvegardée avec succès', path: outputFilePath });
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde ou de l\'accès au fichier:', error);
+        res.status(500).json({ error: 'Échec de la sauvegarde de la vidéo' });
+    }
+});
+
+
 // Démarrer le serveur
 app.listen(PORT, () => {
     console.log(`Serveur actif sur le port ${PORT}`);
