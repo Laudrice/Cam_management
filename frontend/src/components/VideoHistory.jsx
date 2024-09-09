@@ -106,13 +106,8 @@ const VideoHistory = ({ channelId }) => {
             </div>
             {loading && (
                 <div className="flex justify-center items-center mt-4">
-                    <ThreeDots color="#00BFFF" height={80} width={80} />
+                    <ThreeDots color="#15803d" height={80} width={80} />
                 </div>
-            )}
-            {videoUrl && (
-                <a href={`http://10.4.105.29:8080/${videoUrl}`} download>
-                    Télécharger la vidéo
-                </a>
             )}
             <br />
             {error && <p className="text-red-500 mt-4">{error}</p>}

@@ -12,6 +12,7 @@ const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const moment = require('moment');
+const { promisify } = require('util');
 
 const app = express();
 
@@ -271,7 +272,6 @@ app.get('/video-history/:channelId', async (req, res) => {
     });
 });
 
-const { promisify } = require('util');
 
 app.get('/save-video/:channelId', async (req, res) => {
     const { channelId } = req.params;
@@ -287,25 +287,28 @@ app.get('/save-video/:channelId', async (req, res) => {
     const formattedStartTime = formatRTSPDate(adjustedStartTime);
     const formattedEndTime = formatRTSPDate(adjustedEndTime);
 
+    // Calcul de la durée en secondes
+    const durationInSeconds = (adjustedEndTime.getTime() - adjustedStartTime.getTime()) / 1000;
+
     const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
     console.log(`Requête: ${rtspUrl}`);
 
-    // Chemin du répertoire sous Windows avec barres obliques inverses échappées
     const outputDir = path.join('C:', 'Users', 'Freddy', 'Downloads', 'Vidéo de surveillance');
     if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
     }
 
     const outputFilePath = path.join(outputDir, `video_${channelId}_${formattedStartTime}_${formattedEndTime}.mp4`);
-    
+
     const ffmpegProcess = ffmpeg(rtspUrl)
         .setFfmpegPath(ffmpegPath)
-        .outputOptions('-c:v', 'libx264')  // Convertir en H.264
-        .outputOptions('-preset', 'ultrafast')  // Vitesse rapide
-        .outputOptions('-tune', 'zerolatency')  // Faible latence
-        .outputOptions('-an')  // Pas d'audio
-        .outputOptions('-movflags', 'frag_keyframe+empty_moov+default_base_moof')  // Permet la lecture progressive
-        .outputOptions('-bufsize', '500k')  // Réglage du buffer
+        .outputOptions('-c:v', 'libx264')
+        .outputOptions('-preset', 'ultrafast')
+        .outputOptions('-tune', 'zerolatency')
+        .outputOptions('-an')
+        .outputOptions('-movflags', '+faststart')
+        .outputOptions('-t', durationInSeconds)
+        .outputOptions('-s', '1366x768')
         .save(outputFilePath);
 
     const waitForEnd = () => new Promise((resolve, reject) => {
@@ -335,7 +338,6 @@ app.get('/save-video/:channelId', async (req, res) => {
         res.status(500).json({ error: 'Échec de la sauvegarde de la vidéo' });
     }
 });
-
 
 // Démarrer le serveur
 app.listen(PORT, () => {
