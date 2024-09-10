@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import moment from 'moment';
 import { ThreeDots } from 'react-loader-spinner';
 
@@ -8,6 +8,19 @@ const VideoHistory = ({ channelId }) => {
     const [videoUrl, setVideoUrl] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [localVideo, setLocalVideo] = useState(null); // Gérer la vidéo locale
+    const [playbackRate, setPlaybackRate] = useState(1); // Gérer la vitesse de lecture
+
+    const videoRef = useRef(null); // Référence pour accéder à la vidéo
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const videoURL = URL.createObjectURL(file);
+            setLocalVideo(videoURL);
+            setVideoUrl(videoURL); // Remplacer par la vidéo locale
+        }
+    };
 
     const handleDownloadVideo = async () => {
         setError('');
@@ -65,6 +78,15 @@ const VideoHistory = ({ channelId }) => {
         }
     };
 
+    // Gérer le changement de vitesse de lecture
+    const handlePlaybackRateChange = (e) => {
+        const rate = parseFloat(e.target.value);
+        setPlaybackRate(rate);
+        if (videoRef.current) {
+            videoRef.current.playbackRate = rate; // Appliquer la vitesse au lecteur
+        }
+    };
+
     return (
         <div className="video-history-container">
             <h4 className="text-xl font-bold mb-4">Informations</h4>
@@ -104,11 +126,47 @@ const VideoHistory = ({ channelId }) => {
                     Enregistrer la vidéo
                 </button>
             </div>
+
+            {/* Input pour sélectionner une vidéo locale */}
+            <div className="mt-4">
+                <label htmlFor="localVideo" className="block mb-2">Ou sélectionner une vidéo locale:</label>
+                <input
+                    id="localVideo"
+                    type="file"
+                    accept="video/mp4/mkv"
+                    onChange={handleFileChange}
+                    className="border border-gray-300 p-2 rounded-md"
+                />
+            </div>
+
+            {/* Sélection de la vitesse de lecture */}
+            <div className="mt-4">
+                <label htmlFor="playbackRate" className="block mb-2">Vitesse de lecture:</label>
+                <select
+                    id="playbackRate"
+                    value={playbackRate}
+                    onChange={handlePlaybackRateChange}
+                    className="border border-gray-300 p-2 rounded-md"
+                >
+                    <option value="0.25">0.25x</option>
+                    <option value="0.5">0.5x</option>
+                    <option value="1">1x (normal)</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                    <option value="4">4x</option>
+                    <option value="8">8x</option>
+                    <option value="16">16x</option>
+                    <option value="32">32x</option>
+                    <option value="64">64x</option>
+                </select>
+            </div>
+
             {loading && (
                 <div className="flex justify-center items-center mt-4">
                     <ThreeDots color="#15803d" height={80} width={80} />
                 </div>
             )}
+
             <br />
             {error && <p className="text-red-500 mt-4">{error}</p>}
             {videoUrl && !error && (
@@ -116,7 +174,7 @@ const VideoHistory = ({ channelId }) => {
                     <br />
                     <hr />
                     <br />
-                    <video controls style={{ width: '100%', borderRadius:'1rem', border:'1px solid grey' }}>
+                    <video ref={videoRef} controls style={{ width: '100%', borderRadius:'1rem', border:'1px solid grey' }}>
                         <source src={videoUrl} type="video/mp4" />
                         Votre navigateur ne supporte pas la balise vidéo.
                     </video>

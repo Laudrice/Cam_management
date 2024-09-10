@@ -287,7 +287,6 @@ app.get('/save-video/:channelId', async (req, res) => {
     const formattedStartTime = formatRTSPDate(adjustedStartTime);
     const formattedEndTime = formatRTSPDate(adjustedEndTime);
 
-    // Calcul de la durée en secondes
     const durationInSeconds = (adjustedEndTime.getTime() - adjustedStartTime.getTime()) / 1000;
 
     const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
@@ -304,6 +303,7 @@ app.get('/save-video/:channelId', async (req, res) => {
         .setFfmpegPath(ffmpegPath)
         .outputOptions('-c:v', 'libx264')
         .outputOptions('-preset', 'ultrafast')
+        .outputOptions('-threads', '4')
         .outputOptions('-tune', 'zerolatency')
         .outputOptions('-an')
         .outputOptions('-movflags', '+faststart')
@@ -331,6 +331,14 @@ app.get('/save-video/:channelId', async (req, res) => {
 
         // Vérifier que le fichier existe et est accessible
         await promisify(fs.access)(outputFilePath, fs.constants.R_OK);
+
+        // Ouvrir le fichier vidéo avec VLC à une vitesse de lecture de 32x
+        const vlcPath = 'C:/Program Files/VideoLAN/VLC/vlc.exe';
+        const vlcArgs = [
+            outputFilePath,
+            '--rate=32'
+        ];
+        spawn(vlcPath, vlcArgs, { detached: true, stdio: 'ignore' });
 
         res.status(200).json({ message: 'Vidéo sauvegardée avec succès', path: outputFilePath });
     } catch (error) {
