@@ -1,8 +1,10 @@
+require('dotenv').config();
+
 const { where } = require('sequelize')
 const db = require('../models')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const secretKey = 'votreSecret'
+const secretKey = process.env.SECRET_KEY
 
 // Create main Model
 const User = db.users

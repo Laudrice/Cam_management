@@ -302,15 +302,19 @@ app.get('/save-video/:channelId', async (req, res) => {
     const ffmpegProcess = ffmpeg(rtspUrl)
         .setFfmpegPath(ffmpegPath)
         .outputOptions('-c:v', 'libx264')
-        .outputOptions('-preset', 'ultrafast')
-        .outputOptions('-threads', '4')
+        .outputOptions('-preset', 'veryfast')
+        .outputOptions('-threads', '0')
         .outputOptions('-tune', 'zerolatency')
         .outputOptions('-an')
         .outputOptions('-movflags', '+faststart')
         .outputOptions('-t', durationInSeconds)
         .outputOptions('-s', '1366x768')
+        .outputOptions('-g', '50')
+        .outputOptions('-b:v', '2M')
+        .outputOptions('-maxrate', '2.5M')
+        .outputOptions('-bufsize', '5M')
         .save(outputFilePath);
-
+d
     const waitForEnd = () => new Promise((resolve, reject) => {
         ffmpegProcess
             .on('end', () => {
@@ -329,16 +333,11 @@ app.get('/save-video/:channelId', async (req, res) => {
     try {
         await waitForEnd();
 
-        // Vérifier que le fichier existe et est accessible
+        // Accessibilité du fichier 
         await promisify(fs.access)(outputFilePath, fs.constants.R_OK);
 
-        // Ouvrir le fichier vidéo avec VLC à une vitesse de lecture de 32x
-        const vlcPath = 'C:/Program Files/VideoLAN/VLC/vlc.exe';
-        const vlcArgs = [
-            outputFilePath,
-            '--rate=32'
-        ];
-        spawn(vlcPath, vlcArgs, { detached: true, stdio: 'ignore' });
+        // Ouverture de l'explorateur de fichier
+        const openExplorer = spawn('explorer', ['/select,', outputFilePath], { detached: true, stdio: 'ignore' });
 
         res.status(200).json({ message: 'Vidéo sauvegardée avec succès', path: outputFilePath });
     } catch (error) {
@@ -346,6 +345,31 @@ app.get('/save-video/:channelId', async (req, res) => {
         res.status(500).json({ error: 'Échec de la sauvegarde de la vidéo' });
     }
 });
+
+app.get('/video/:channelId/hls', async (req, res) => {
+    const { channelId } = req.params;
+    const { startTime, endTime } = req.query;
+
+    // Générer le flux HLS à partir du RTSP
+    const outputDir = path.join(__dirname, 'hls', channelId);
+    const playlistPath = path.join(outputDir, 'playlist.m3u8');
+
+    // Lancer le processus FFmpeg si les fichiers HLS n'existent pas déjà
+    if (!fs.existsSync(playlistPath)) {
+        const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${startTime}&endtime=${endTime}`;
+        ffmpeg(rtspUrl)
+            .outputOptions('-c:v', 'libx264')
+            .outputOptions('-f', 'hls')
+            .outputOptions('-hls_time', '10')
+            .outputOptions('-hls_playlist_type', 'event')
+            .output(path.join(outputDir, 'playlist.m3u8'))
+            .run();
+    }
+
+    res.sendFile(playlistPath);
+});
+
+
 
 // Démarrer le serveur
 app.listen(PORT, () => {

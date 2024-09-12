@@ -126,6 +126,11 @@ const VideoHistory = ({ channelId }) => {
                     Enregistrer la vidéo
                 </button>
             </div>
+            {loading && (
+                <div className="flex justify-center items-center mt-4">
+                    <ThreeDots color="#15803d" height={80} width={80} />
+                </div>
+            )}
 
             {/* Input pour sélectionner une vidéo locale */}
             <div className="mt-4">
@@ -160,12 +165,6 @@ const VideoHistory = ({ channelId }) => {
                     <option value="64">64x</option> */}
                 </select>
             </div>
-
-            {loading && (
-                <div className="flex justify-center items-center mt-4">
-                    <ThreeDots color="#15803d" height={80} width={80} />
-                </div>
-            )}
 
             <br />
             {error && <p className="text-red-500 mt-4">{error}</p>}
