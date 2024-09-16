@@ -314,7 +314,7 @@ app.get('/save-video/:channelId', async (req, res) => {
         .outputOptions('-maxrate', '2.5M')
         .outputOptions('-bufsize', '5M')
         .save(outputFilePath);
-d
+
     const waitForEnd = () => new Promise((resolve, reject) => {
         ffmpegProcess
             .on('end', () => {
@@ -375,4 +375,3 @@ app.get('/video/:channelId/hls', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Serveur actif sur le port ${PORT}`);
 });
-
