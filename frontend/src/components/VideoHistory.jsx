@@ -8,7 +8,7 @@ const VideoHistory = ({ channelId }) => {
     const [videoUrl, setVideoUrl] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [localVideo, setLocalVideo] = useState(null); // Gérer la vidéo locale
+    const [localVideo, setLocalVideo] = useState(null); // Vidéo locale
     const [playbackRate, setPlaybackRate] = useState(1); // Gérer la vitesse de lecture
 
     const videoRef = useRef(null); // Référence pour accéder à la vidéo
@@ -82,8 +82,31 @@ const VideoHistory = ({ channelId }) => {
     const handlePlaybackRateChange = (e) => {
         const rate = parseFloat(e.target.value);
         setPlaybackRate(rate);
+        
         if (videoRef.current) {
-            videoRef.current.playbackRate = rate; // Appliquer la vitesse au lecteur
+            if (rate === 32) {
+                // Simuler un saut d'images pour *32
+                const jumpInterval = 2; // Avancer de 2 secondes à chaque saut
+                const jumpFrames = () => {
+                    if (videoRef.current && videoRef.current.currentTime + jumpInterval < videoRef.current.duration) {
+                        videoRef.current.currentTime += jumpInterval;
+                        setTimeout(jumpFrames, 100); // Répéter le saut toutes les 100ms
+                    }
+                };
+                jumpFrames();
+            }else if(rate == 64){
+                const jumpInterval = 4; // Avancer de 2 secondes à chaque saut
+                const jumpFrames = () => {
+                    if (videoRef.current && videoRef.current.currentTime + jumpInterval < videoRef.current.duration) {
+                        videoRef.current.currentTime += jumpInterval;
+                        setTimeout(jumpFrames, 100); // Répéter le saut toutes les 100ms
+                    }
+                };
+                jumpFrames();
+            } 
+            else {
+                videoRef.current.playbackRate = rate; // Appliquer les autres vitesses normalement
+            }
         }
     };
 
@@ -161,8 +184,8 @@ const VideoHistory = ({ channelId }) => {
                     <option value="4">4x</option>
                     <option value="8">8x</option>
                     <option value="16">16x</option>
-                    {/* <option value="32">32x</option>
-                    <option value="64">64x</option> */}
+                    <option value="32">32x</option>
+                    <option value="64">64x</option>
                 </select>
             </div>
 
