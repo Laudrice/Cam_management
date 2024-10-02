@@ -464,7 +464,7 @@ app.get('/api/videos/motion', async (req, res) => {
                     <endTime>${endTime}</endTime>
                 </timeSpan>
                 <eventTypeList><eventType>VMD</eventType></eventTypeList>
-                <maxResults>100000</maxResults>
+                <maxResults>100000000</maxResults>
                 <searchResultPostion>0</searchResultPostion>
             </CMSearchDescription>
         `;

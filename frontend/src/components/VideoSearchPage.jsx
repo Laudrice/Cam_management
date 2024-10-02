@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from '../axiosConfig';
 import Modal from 'react-modal';
 import moment from 'moment';
@@ -15,7 +15,6 @@ const VideoSearchPage = () => {
     const [videoUrl, setVideoUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [ffmpegProcess, setFfmpegProcess] = useState(null); // Nouvel état pour le processus FFmpeg
 
     useEffect(() => {
         fetchCameras();
@@ -65,7 +64,6 @@ const VideoSearchPage = () => {
             }
             setVideoUrl(streamUrl);
             setIsModalOpen(true);
-            // Vous pouvez également lancer ici un processus FFmpeg si nécessaire
         } catch (err) {
             console.error(err);
             setError(err.message);
@@ -88,14 +86,9 @@ const VideoSearchPage = () => {
         }
     };
 
-    const closeModal = async () => {
+    const closeModal = () => {
         setIsModalOpen(false);
         setVideoUrl('');
-        
-        // Appel à l'API pour arrêter le flux vidéo
-        if (selectedCamera) {
-            await axios.post(`/stop-video/${selectedCamera}`);
-        }
     };
 
     return (
@@ -106,7 +99,7 @@ const VideoSearchPage = () => {
                 <select value={selectedCamera} onChange={e => setSelectedCamera(e.target.value)}>
                     <option value="">Sélectionnez une caméra</option>
                     {cameras.map(camera => (
-                        <option key={camera.id} value={camera.id}>{camera.name}</option>
+                        <option key={camera.id} value={camera.id}>{camera.nom_}</option>
                     ))}
                 </select>
             </div>
