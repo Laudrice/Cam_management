@@ -26,7 +26,7 @@ const VideoHistoryPage = () => {
 
         if (cameraId) {
             try {
-                const response = await fetch(`http://10.4.105.29:8080/video-history/${cameraId}`);
+                const response = await fetch(`http://localhost:8080/video-history/${cameraId}`);
                 const data = await response.json();
                 if (data) {
                     setCameraName(data.cameraName);

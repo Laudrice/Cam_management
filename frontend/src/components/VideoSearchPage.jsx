@@ -55,7 +55,7 @@ const VideoSearchPage = () => {
 
     const openModal = async (videoData) => {
         setError('');
-        const streamUrl = `http://10.4.105.29:8080/video-event/${selectedCamera}?startTime=${videoData.startTime}&endTime=${videoData.endTime}`;
+        const streamUrl = `http://localhost:8080/video-event/${selectedCamera}?startTime=${videoData.startTime}&endTime=${videoData.endTime}`;
         
         try {
             const response = await fetch(streamUrl);
@@ -71,7 +71,7 @@ const VideoSearchPage = () => {
     };
 
     const handleDownloadVideo = async (videoData) => {
-        const downloadUrl = `http://10.4.105.29:8080/save-video/${selectedCamera}?startTime=${videoData.startTime}&endTime=${videoData.endTime}`;
+        const downloadUrl = `http://localhost:8080/save-video/${selectedCamera}?startTime=${videoData.startTime}&endTime=${videoData.endTime}`;
         
         try {
             const response = await fetch(downloadUrl);

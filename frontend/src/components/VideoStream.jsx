@@ -7,7 +7,7 @@ const VideoStream = ({ channelId, quality = 'low', onClick }) => {
         const videoElement = videoRef.current;
         if (videoElement) {
             const qualityEndpoint = quality === 'high' ? 'stream-high' : quality === 'low' ? 'stream-lowest' : 'stream';
-            videoElement.src = `http://10.4.105.29:8080/${qualityEndpoint}/${channelId}`;
+            videoElement.src = `http://localhost:8080/${qualityEndpoint}/${channelId}`;
             videoElement.play().catch(e => console.error('Error playing video:', e));
         }
 

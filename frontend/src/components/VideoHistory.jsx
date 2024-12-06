@@ -31,7 +31,7 @@ const VideoHistory = ({ channelId }) => {
             return;
         }
 
-        const downloadUrl = `http://10.4.105.29:8080/save-video/${channelId}?startTime=${startTime}&endTime=${endTime}`;
+        const downloadUrl = `http://localhost:8080/save-video/${channelId}?startTime=${startTime}&endTime=${endTime}`;
 
         try {
             const response = await fetch(downloadUrl);
@@ -60,7 +60,7 @@ const VideoHistory = ({ channelId }) => {
             return;
         }
 
-        const streamUrl = `http://10.4.105.29:8080/video-history/${channelId}?startTime=${startTime}&endTime=${endTime}`;
+        const streamUrl = `http://localhost:8080/video-history/${channelId}?startTime=${startTime}&endTime=${endTime}`;
 
         try {
             const response = await fetch(streamUrl);

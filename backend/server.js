@@ -302,6 +302,8 @@ app.get('/save-video/:channelId', async (req, res) => {
 
     const ffmpegProcess = ffmpeg(rtspUrl)
         .setFfmpegPath(ffmpegPath)
+        .inputOptions('-rtsp_transport', 'tcp')  // Utiliser TCP
+        .inputOptions('-buffer_size', '10000000')  // Taille du buffer
         .outputOptions('-c:v', 'libx264')
         .outputOptions('-preset', 'veryfast')
         .outputOptions('-threads', '0')
@@ -309,12 +311,12 @@ app.get('/save-video/:channelId', async (req, res) => {
         .outputOptions('-an')
         .outputOptions('-movflags', '+faststart')
         .outputOptions('-t', durationInSeconds)
-        .outputOptions('-s', '1366x768')
-        .outputOptions('-g', '50')
-        .outputOptions('-b:v', '2M')
-        .outputOptions('-maxrate', '2.5M')
-        .outputOptions('-bufsize', '5M')
+        .outputOptions('-s', '1280x720')  // Réduire la résolution
+        .outputOptions('-b:v', '1M')  // Réduire le débit binaire
+        .outputOptions('-maxrate', '1.5M')
+        .outputOptions('-bufsize', '3M')
         .save(outputFilePath);
+
 
     const waitForEnd = () => new Promise((resolve, reject) => {
         ffmpegProcess
@@ -406,7 +408,9 @@ app.get('/api/videos/vehicle', async (req, res) => {
             <maxResults>1000000</maxResults>
             <searchResultPostion>0</searchResultPostion>
             <metadataList>
-                <metadataDescriptor>//metadata.vehicleDetection</metadataDescriptor>
+                <metadataDescriptor>
+                    <metaID>/recordType.meta.std-cgi.com/vehicleDetection</metaID>
+                </metadataDescriptor>
             </metadataList>
         </CMSearchDescription>`;
 
@@ -430,10 +434,10 @@ app.get('/api/videos/vehicle', async (req, res) => {
                 startTime: match.timeSpan[0].startTime[0],
                 endTime: match.timeSpan[0].endTime[0],
                 playbackURI: match.mediaSegmentDescriptor[0].playbackURI[0],
-                eventType: 'Vehicle Detection'
+                targetType: 'vehicle'
             })) : [];
 
-            console.log('Résultats des vidéos:', videos); // Afficher le résultat avant de renvoyer
+            console.log('Résultats des vidéos:', videos);
             res.json(videos);
         });
     } catch (error) {

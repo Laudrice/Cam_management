@@ -15,7 +15,7 @@ const CameraList = () => {
 
     const fetchCameras = async () => {
         try {
-            const response = await fetch('http://10.4.105.29:8080/cameras');
+            const response = await fetch('http://localhost:8080/cameras');
             const data = await response.json();
             if (data.status === 'success') {
                 setCameras(data.data);

@@ -62,7 +62,6 @@ const Login = () => {
                 </form>
                 <div className="mt-4 text-center">
                     <a href="/forgot-password" className="text-green-600 hover:underline">Mot de passe oublié ?</a>
-                    <h1 className='' style={{color:'red',fontWeight:'800'}}>WAMP</h1>
                 </div>
             </div>
         </div>
