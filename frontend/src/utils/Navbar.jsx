@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faSignOutAlt, faTimes, faBars,faVideo } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faSignOutAlt, faTimes, faBars,faVideo,faCalendarAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from '../context/AuthContext';
 
 const Navbar = () => {
@@ -35,6 +35,7 @@ const Navbar = () => {
                     <Link to="/cameras" className="hover:bg-green-600 px-3 py-2 rounded">Caméras</Link>
                     <Link to="/history" className="hover:bg-green-600 px-3 py-2 rounded">Vidéos</Link>
                     <Link to="/videos" className="hover:bg-green-600 px-3 py-2 rounded">Stream</Link>
+                    <Link to="/vehiclePhoto" className="hover:bg-green-600 px-3 py-2 rounded">Voitures</Link>
                 </nav>
 
                 {/* Logo de profil à droite */}

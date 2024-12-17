@@ -21,11 +21,12 @@ const app = express();
 const corsOptions = {
     origin: 'http://localhost:3000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 // Middleware
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const digestAuth = new axiosDigestAuth({
@@ -409,7 +410,7 @@ app.get('/api/videos/vehicle', async (req, res) => {
             <searchResultPostion>0</searchResultPostion>
             <metadataList>
                 <metadataDescriptor>
-                    <metaID>/recordType.meta.std-cgi.com/vehicleDetection</metaID>
+                    <metaID>/recordType.meta.std-cgi.com/vehicles</metaID>
                 </metadataDescriptor>
             </metadataList>
         </CMSearchDescription>`;
@@ -529,8 +530,8 @@ app.get('/video-event/:channelId', async (req, res) => {
         '-rtsp_transport', 'tcp',
         '-fflags', '+genpts',
         '-i', rtspUrl,
-        '-vf', 'scale=1280:720', // Réduction à 720p
-        '-b:v', '2500k', // Ajustez le bitrate selon vos besoins
+        '-vf', 'scale=1280:720',
+        '-b:v', '2500k',
         '-vcodec', 'libx264',
         '-preset', 'superfast',
         '-tune', 'zerolatency',
@@ -539,7 +540,7 @@ app.get('/video-event/:channelId', async (req, res) => {
         '-f', 'mp4',
         '-'
     ];
-    
+
 
     const ffmpegProcess = spawn('ffmpeg', ffmpegArgs);
     ffmpegProcess.stdout.pipe(res);
@@ -559,9 +560,94 @@ app.get('/video-event/:channelId', async (req, res) => {
 });
 
 
+app.get('/api/photos/vehicle', async (req, res) => {
+    try {
+        let { cameraId, startTime, endTime } = req.query;
+
+        if (!cameraId || !startTime || !endTime) {
+            return res.status(400).json({ error: 'Les paramètres cameraId, startTime et endTime sont requis' });
+        }
+
+        cameraId = parseInt(cameraId, 10) + 2;
+
+        const searchXml = `<CMSearchDescription><searchID>CB012982-8730-0001-B6E1-1440BB6E2580</searchID><trackList><trackID>${cameraId}</trackID></trackList><timeSpanList><timeSpan><startTime>${startTime}</startTime><endTime>${endTime}</endTime></timeSpan></timeSpanList><contentTypeList><contentType>metadata</contentType></contentTypeList><maxResults>1000</maxResults><searchResultPostion>150</searchResultPostion><metadataList><metadataDescriptor>//recordType.meta.std-cgi.com/vehicleDetection</metadataDescriptor><SearchProperity><plateSearchMask/><country>255</country></SearchProperity></metadataList></CMSearchDescription>`;
+
+        console.log('Requête XML:', searchXml);
+
+        const response = await digestAuth.request({
+            url: `http://${process.env.RTSP_HOST}:80/ISAPI/ContentMgmt/search`,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/xml' },
+            data: searchXml,
+        });
+
+        console.log('Réponse ISAPI:', response.data);
+
+        xml2js.parseString(response.data, (err, result) => {
+            if (err) {
+                console.error('Erreur de parsing XML:', err);
+                return res.status(500).json({ error: 'Erreur de traitement des données' });
+            }
+
+            const matches = result?.CMSearchResult?.matchList?.[0]?.searchMatchItem || [];
+            if (!matches || matches.length === 0) {
+                return res.json({ photos: [] });
+            }
+
+            // conversion en yyyymmddThhmmssZ
+            const formatDate = (date) => {
+                const d = new Date(date);
+                const year = d.getUTCFullYear();
+                const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(d.getUTCDate()).padStart(2, '0');
+                const hours = String(d.getUTCHours()).padStart(2, '0');
+                const minutes = String(d.getUTCMinutes()).padStart(2, '0');
+                const seconds = String(d.getUTCSeconds()).padStart(2, '0');
+
+                return `${year}${month}${day}T${hours}${minutes}${seconds}Z`;
+            };
+
+            const photos = matches.map(match => {
+                let trackID = match.trackID ? match.trackID[0] : null;
+                let startTime = match.timeSpan[0]?.startTime[0];
+                let endTime = match.timeSpan[0]?.endTime[0];
+                let playbackURI = match.mediaSegmentDescriptor?.[0]?.playbackURI?.[0];
+                let name = null;
+            
+                if (playbackURI) {
+                    playbackURI = playbackURI.replace(/&amp;/g, '&'); // Décoder &amp;
+            
+                    // Extraire le paramètre `name` de playbackURI
+                    const urlParams = new URLSearchParams(playbackURI.split('?')[1]);
+                    name = urlParams.get('name');
+                }
+            
+                const formattedStartTime = formatDate(startTime);
+                const formattedEndTime = formatDate(endTime);
+            
+                const imageURL = playbackURI
+                    ? playbackURI
+                    : `http://${process.env.RTSP_HOST}/ISAPI/Streaming/tracks/${trackID}/?starttime=${formattedStartTime}&endtime=${formattedEndTime}&name=${name || 'unknown'}&size=734722`;
+            
+                console.log('imageURL généré:', imageURL);
+            
+                return { trackID, startTime: formattedStartTime, endTime: formattedEndTime, name, imageURL };
+            });
+            
+            res.json({ photos });
+            
+        });
+    } catch (error) {
+        console.error('Erreur lors de la récupération des photos :', error);
+        res.status(500).json({ error: 'Erreur interne du serveur', details: error.message });
+    }
+});
 
 
 
+
+  
+module.exports = app;
 
 
 

@@ -11,6 +11,7 @@ import VideoHistory from './components/VideoHistory';
 import CameraList from './components/CameraList';
 import VideoHistoryPage from './components/VideoHistoryPage';
 import VideoSearchPage from './components/VideoSearchPage';
+import VehiclePhotos from './components/VehiclePhotos';
 
 const App = () => {
 
@@ -54,7 +55,8 @@ const App = () => {
                 <Route path="/cameras" element={<ProtectedRoute component={CameraManagement} />} />
                 <Route path="/history" element={<ProtectedRoute component={VideoHistoryPage} />} />
                 <Route path="/videos" element={<ProtectedRoute component={CameraList} />} />
-                <Route path="/events" element={<ProtectedRoute component={VideoSearchPage} />} />
+                {/* <Route path="/events" element={<ProtectedRoute component={VideoSearchPage} />} /> */}
+                <Route path="/vehiclePhoto" element={<ProtectedRoute component={VehiclePhotos} />} />
                 <Route path="/" element={<ProtectedRoute component={Home} />} />
             </Routes>
         </Router>

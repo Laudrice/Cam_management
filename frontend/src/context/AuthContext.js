@@ -35,6 +35,11 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
+    const [digestAuth, setDigestAuth] = useState({
+        username: 'admin',  // Utilisateur pour Digest Auth
+        password: 'CamAdmin2023',  // Mot de passe pour Digest Auth
+    });
+
     const login = (token) => {
         // console.log('Login called with token:', token);
         localStorage.setItem('token', token);
@@ -76,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout,digestAuth }}>
             {children}
         </AuthContext.Provider>
     );
