@@ -2,7 +2,6 @@ require('dotenv').config();
 const axiosDigestAuth = require('@mhoc/axios-digest-auth').default;
 const xml2js = require('xml2js');
 
-// Création d'une instance pour l'authentification Digest
 const digestAuth = new axiosDigestAuth({
     username: process.env.RTSP_USERNAME,
     password: process.env.RTSP_PASSWORD
@@ -54,8 +53,8 @@ const getEventVideos = async (req, res) => {
                 name: video.name || "Inconnu",
                 date: video.timeSpan.startTime || "Inconnu",
                 type: video.type || "Inconnu",
-                previewUrl: video.url.previewUrl || "Inconnu", // URL pour la prévisualisation
-                downloadUrl: video.url.downloadUrl || "Inconnu" // URL pour le téléchargement
+                previewUrl: video.url.previewUrl || "Inconnu",
+                downloadUrl: video.url.downloadUrl || "Inconnu"
             }));
 
             res.status(200).send(videos);
@@ -68,5 +67,5 @@ const getEventVideos = async (req, res) => {
 
 module.exports = {
     getEventList,
-    getEventVideos
+    getEventVideos,
 };

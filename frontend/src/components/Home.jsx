@@ -4,7 +4,6 @@ const Home = () => {
     const [cameras, setCameras] = useState([]);
 
     useEffect(() => {
-        // Fetch cameras data from backend
         fetch('/api/cameras')
             .then(response => response.json())
             .then(data => setCameras(data))

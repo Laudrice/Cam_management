@@ -8,17 +8,17 @@ const VideoHistory = ({ channelId }) => {
     const [videoUrl, setVideoUrl] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [localVideo, setLocalVideo] = useState(null); // Vidéo locale
-    const [playbackRate, setPlaybackRate] = useState(1); // Gérer la vitesse de lecture
+    const [localVideo, setLocalVideo] = useState(null);
+    const [playbackRate, setPlaybackRate] = useState(1);
 
-    const videoRef = useRef(null); // Référence pour accéder à la vidéo
+    const videoRef = useRef(null);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
             const videoURL = URL.createObjectURL(file);
             setLocalVideo(videoURL);
-            setVideoUrl(videoURL); // Remplacer par la vidéo locale
+            setVideoUrl(videoURL);
         }
     };
 
@@ -86,26 +86,26 @@ const VideoHistory = ({ channelId }) => {
         if (videoRef.current) {
             if (rate === 32) {
                 // Simuler un saut d'images pour *32
-                const jumpInterval = 2; // Avancer de 2 secondes à chaque saut
+                const jumpInterval = 2;
                 const jumpFrames = () => {
                     if (videoRef.current && videoRef.current.currentTime + jumpInterval < videoRef.current.duration) {
                         videoRef.current.currentTime += jumpInterval;
-                        setTimeout(jumpFrames, 100); // Répéter le saut toutes les 100ms
+                        setTimeout(jumpFrames, 100);
                     }
                 };
                 jumpFrames();
             }else if(rate == 64){
-                const jumpInterval = 4; // Avancer de 2 secondes à chaque saut
+                const jumpInterval = 4; 
                 const jumpFrames = () => {
                     if (videoRef.current && videoRef.current.currentTime + jumpInterval < videoRef.current.duration) {
                         videoRef.current.currentTime += jumpInterval;
-                        setTimeout(jumpFrames, 100); // Répéter le saut toutes les 100ms
+                        setTimeout(jumpFrames, 100);
                     }
                 };
                 jumpFrames();
             } 
             else {
-                videoRef.current.playbackRate = rate; // Appliquer les autres vitesses normalement
+                videoRef.current.playbackRate = rate;
             }
         }
     };

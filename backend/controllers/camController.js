@@ -5,7 +5,6 @@ const ffmpeg = require('fluent-ffmpeg');
 const { spawn } = require('child_process');
 const db = require('../models/index');
 
-// Création d'une instance pour l'authentification Digest
 const digestAuth = new axiosDigestAuth({
     username: process.env.RTSP_USERNAME,
     password: process.env.RTSP_PASSWORD
@@ -14,7 +13,6 @@ const digestAuth = new axiosDigestAuth({
 // Modèle Cam
 const Cam = db.cams;
 
-// Synchronisation des caméras du NVR avec la base de données
 const syncNVRWithDatabase = async () => {
     try {
         const response = await digestAuth.request({
@@ -49,7 +47,6 @@ const syncNVRWithDatabase = async () => {
 
                 const t = await db.sequelize.transaction();
                 try {
-                    // Mettre toutes les caméras sur inactif
                     await db.cams.update({ enabled: 'false' }, { where: {}, transaction: t });
 
                     const existingCams = await db.cams.findAll({ transaction: t });

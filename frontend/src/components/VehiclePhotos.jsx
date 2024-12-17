@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Modal from 'react-modal'; // Assurez-vous d'installer react-modal
+import Modal from 'react-modal';
 import axios from '../axiosConfig';
-import './../assets/css/VehiclePhotos.css'; // Ajouter un fichier CSS pour le style
+import './../assets/css/VehiclePhotos.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 
@@ -16,7 +16,6 @@ const VehiclePhotos = () => {
     const [currentImage, setCurrentImage] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Fonction pour formater la date et l'heure
     const formatDate = (dateString) => {
         const regex = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/;
         const match = dateString.match(regex);
@@ -56,13 +55,12 @@ const VehiclePhotos = () => {
         setLoading(true);
 
         try {
-            const token = localStorage.getItem('authToken'); // Récupérer le jeton depuis le stockage local
+            const token = localStorage.getItem('authToken');
             const url = `http://localhost:8080/api/photos/vehicle?cameraId=${selectedCamera}&startTime=${startTime}&endTime=${endTime}`;
             
-            // Ajouter le jeton d'authentification dans les en-têtes de la requête
             const response = await axios.get(url, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Authentification via Bearer Token
+                    'Authorization': `Bearer ${token}`,
                 },
             });
             
