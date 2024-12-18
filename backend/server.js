@@ -455,11 +455,6 @@ app.get('/proxy-image', async (req, res) => {
     }
 
     try {
-        const digestAuth = new axiosDigestAuth({
-            username: 'admin',
-            password: 'CamAdmin2023',
-        });
-
         const response = await digestAuth.request({
             method: 'GET',
             url: imageUrl,
