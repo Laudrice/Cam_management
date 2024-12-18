@@ -73,9 +73,16 @@ const VehiclePhotos = () => {
     };
 
     const openModal = (imageURL) => {
-        setCurrentImage(imageURL);
+        if (!imageURL) {
+            console.error("URL de l'image non valide :", imageURL);
+            return;
+        }
+        const proxiedImageURL = `http://localhost:8080/proxy-image?imageUrl=${encodeURIComponent(imageURL)}`;
+        setCurrentImage(proxiedImageURL);
         setIsModalOpen(true);
     };
+    
+    
 
     return (
         <div className="p-4 bg-green-50">
@@ -124,12 +131,13 @@ const VehiclePhotos = () => {
                         const { date, time } = formatDate(photo.startTime);
                         return (
                             <div key={index} className="photo-card">
-                                <img
-                                    src={photo.imageURL}
+                               <img
+                                    src={`http://localhost:8080/proxy-image?imageUrl=${encodeURIComponent(photo.imageURL)}`}
                                     className="photo-thumbnail"
                                     onClick={() => openModal(photo.imageURL)}
-                                    style={{'borderBottom':'2px solid #0f3675'}}
+                                    style={{ borderBottom: '2px solid #0f3675' }}
                                 />
+
                                 <div className="photo-info">    
                                     <div className="photo-date">
                                     <FontAwesomeIcon icon={faCalendarAlt} className="mr-2"/> <b>{date}</b>
@@ -145,14 +153,21 @@ const VehiclePhotos = () => {
             </div>
 
             <Modal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} className="modal-content">
-                <img
-                    src={currentImage}
-                    title="Détection de voiture en mouvement"
-                    className="modal-iframe"
-                    style={{ width: '100%', border: 'none' }}
-                ></img>
+                {currentImage ? (
+                    <img
+                        src={currentImage}
+                        title="Détection de voiture en mouvement"
+                        className="modal-iframe"
+                        style={{ width: '100%', border: 'none' }}
+                        alt="Photo véhicule"
+                    />
+                ) : (
+                    <p>Aucune image à afficher</p>
+                )}
                 <button onClick={() => setIsModalOpen(false)} className="close-modal-button">X</button>
             </Modal>
+
+
             <br />
         </div>
         </div>
