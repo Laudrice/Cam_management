@@ -448,6 +448,33 @@ app.get('/api/videos/vehicle', async (req, res) => {
 });
 
 
+app.get('/proxy-image', async (req, res) => {
+    const { imageUrl } = req.query;
+    if (!imageUrl) {
+        return res.status(400).send('Image URL manquante.');
+    }
+
+    try {
+        const digestAuth = new axiosDigestAuth({
+            username: 'admin',
+            password: 'CamAdmin2023',
+        });
+
+        const response = await digestAuth.request({
+            method: 'GET',
+            url: imageUrl,
+            responseType: 'arraybuffer',
+        });
+
+        res.set('Content-Type', response.headers['content-type']);
+        res.send(response.data);
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'image:', error);
+        res.status(500).send('Erreur lors de la récupération de l\'image.');
+    }
+});
+
+
 
 
 // Récupération des vidéos par détection de mouvement
