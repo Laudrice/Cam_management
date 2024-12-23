@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
+import moment from 'moment';
 import axios from '../axiosConfig';
 import './../assets/css/VehiclePhotos.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt, faClock } from '@fortawesome/free-solid-svg-icons';
-
 
 const VehiclePhotos = () => {
     const [cameras, setCameras] = useState([]);
@@ -15,6 +15,10 @@ const VehiclePhotos = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentImage, setCurrentImage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [videoUrl, setVideoUrl] = useState('');
+    const [error, setError] = useState('');
+    const [videoError, setVideoError] = useState('');
+    const videoRef = useRef(null);
 
     const formatDate = (dateString) => {
         const regex = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/;
@@ -82,94 +86,157 @@ const VehiclePhotos = () => {
         setIsModalOpen(true);
     };
     
+    const handleStreamVideo = async (photoStartTime) => {
+        setVideoError('');
+        setVideoUrl('');
+    
+        // Validation et formatage du startTime
+        let parsedStartTime;
+        try {
+            // Vérifiez que photoStartTime est défini et non vide
+            if (!photoStartTime) {
+                throw new Error('La date de début est vide ou non définie');
+            }
+    
+            // Conversion en objet Date avec moment pour mieux gérer le format
+            parsedStartTime = moment(photoStartTime, 'YYYY-MM-DDTHH:mm');
+    
+            // Vérification de la validité de la date
+            if (!parsedStartTime.isValid()) {
+                throw new Error('Format de date invalide pour le streaming');
+            }
+        } catch (err) {
+            setVideoError(err.message);
+            return;
+        }
+    
+        // Format requis : YYYY-MM-DDTHH:mm
+        const streamStartTime = parsedStartTime.format('YYYY-MM-DDTHH:mm');
+    
+        // Ajout de 30 minutes pour définir le streamEndTime
+        const streamEndTime = parsedStartTime.add(30, 'minutes').format('YYYY-MM-DDTHH:mm');
+    
+        // URL de streaming
+        const streamUrl = `http://localhost:8080/video-history/${selectedCamera}?startTime=${streamStartTime}&endTime=${streamEndTime}`;
+    
+        try {
+            const response = await fetch(streamUrl);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Échec de la récupération de la vidéo');
+            }
+            setVideoUrl(streamUrl);
+        } catch (err) {
+            console.error('Erreur lors de la récupération de la vidéo:', err);
+            setVideoError(err.message);
+        }
+    };
+    
+    
     
 
     return (
         <div className="p-4 bg-green-50">
-        <div className="block p-6 bg-white border border-gray-200 rounded-lg shadow-lg" style={{ width: '90%', margin: 'auto' }}>
-            <div className="flex" style={{ justifyContent: 'space-between' }}>
-                <h1 className="text-2xl font-bold mb-4">Photos Véhicule</h1>
-            </div>
-            <br />
-            <hr />
-            <br />
-            <div className="search-controls">
-            <label htmlFor="cameraSelect" className="mr-4">Sélectionner une caméra :</label>
-                <select
-                    value={selectedCamera}
-                    onChange={(e) => setSelectedCamera(e.target.value)}
-                    className="border border-gray-300 p-2 rounded-md"
-                >
-                    <option value="">Sélectionner une caméra</option>
-                    {cameras.map((camera) => (
-                        <option key={camera.id} value={camera.id}>
-                            {camera.nom_}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    type="datetime-local"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                />
-                <input
-                    type="datetime-local"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                />
-                <button onClick={searchPhotos} disabled={loading}>
-                    {loading ? 'Chargement...' : 'Rechercher'}
-                </button>
-            </div>
-            <hr />
-            <br />
-            <div className="photos-grid">
-                {photos.length === 0 ? (
-                    <p>Aucune photo trouvée</p>
-                ) : (
-                    photos.map((photo, index) => {
-                        const { date, time } = formatDate(photo.startTime);
-                        return (
-                            <div key={index} className="photo-card">
-                               <img
-                                    src={`http://localhost:8080/proxy-image?imageUrl=${encodeURIComponent(photo.imageURL)}`}
-                                    className="photo-thumbnail"
-                                    onClick={() => openModal(photo.imageURL)}
-                                    style={{ borderBottom: '2px solid #0f3675' }}
-                                />
-
-                                <div className="photo-info">    
-                                    <div className="photo-date">
-                                    <FontAwesomeIcon icon={faCalendarAlt} className="mr-2"/> <b>{date}</b>
-                                    </div>
-                                    <div className="photo-time">
-                                    <FontAwesomeIcon icon={faClock} className="mr-2"/> <b>{time}</b>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })
-                )}
-            </div>
-
-            <Modal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} className="modal-content">
-                {currentImage ? (
-                    <img
-                        src={currentImage}
-                        title="Détection de voiture en mouvement"
-                        className="modal-iframe"
-                        style={{ width: '100%', border: 'none' }}
-                        alt="Photo véhicule"
+            <div className="block p-6 bg-white border border-gray-200 rounded-lg shadow-lg" style={{ width: '90%', margin: 'auto' }}>
+                <div className="flex" style={{ justifyContent: 'space-between' }}>
+                    <h1 className="text-2xl font-bold mb-4">Photos Véhicule</h1>
+                </div>
+                <br />
+                <hr />
+                <br />
+                <div className="search-controls">
+                    <label htmlFor="cameraSelect" className="mr-4">Sélectionner une caméra :</label>
+                    <select
+                        value={selectedCamera}
+                        onChange={(e) => setSelectedCamera(e.target.value)}
+                        className="border border-gray-300 p-2 rounded-md"
+                    >
+                        <option value="">Sélectionner une caméra</option>
+                        {cameras.map((camera) => (
+                            <option key={camera.id} value={camera.id}>
+                                {camera.nom_}
+                            </option>
+                        ))}
+                    </select>
+                    <input
+                        type="datetime-local"
+                        value={startTime}
+                        onChange={(e) => setStartTime(e.target.value)}
                     />
-                ) : (
-                    <p>Aucune image à afficher</p>
+                    <input
+                        type="datetime-local"
+                        value={endTime}
+                        onChange={(e) => setEndTime(e.target.value)}
+                    />
+                    <button onClick={searchPhotos} disabled={loading}>
+                        {loading ? 'Chargement...' : 'Rechercher'}
+                    </button>
+                </div>
+                <hr />
+                <br />
+                <div className="photos-grid">
+                    {photos.length === 0 ? (
+                        <p>Aucune photo trouvée</p>
+                    ) : (
+                        photos.map((photo, index) => {
+                            const { date, time } = formatDate(photo.startTime);
+                            return (
+                                <div key={index} className="photo-card">
+                                    <img
+                                        src={`http://localhost:8080/proxy-image?imageUrl=${encodeURIComponent(photo.imageURL)}`}
+                                        className="photo-thumbnail"
+                                        onClick={() => openModal(photo.imageURL)}
+                                        style={{ borderBottom: '2px solid #0f3675' }}
+                                    />
+                                    <div className="photo-info">    
+                                        <div className="photo-date">
+                                            <FontAwesomeIcon icon={faCalendarAlt} className="mr-2"/> <b>{date}</b>
+                                        </div>
+                                        <div className="photo-time">
+                                            <FontAwesomeIcon icon={faClock} className="mr-2"/> <b>{time}</b>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleStreamVideo(photo.startTime)}
+                                        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+                                    >
+                                        Voir la vidéo
+                                    </button>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+
+                <Modal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)} className="modal-content">
+                    {currentImage ? (
+                        <img
+                            src={currentImage}
+                            title="Détection de voiture en mouvement"
+                            className="modal-iframe"
+                            style={{ width: '100%', border: 'none' }}
+                            alt="Photo véhicule"
+                        />
+                    ) : (
+                        <p>Aucune image à afficher</p>
+                    )}
+                    <button onClick={() => setIsModalOpen(false)} className="close-modal-button">X</button>
+                </Modal>
+                <br />
+                {error && <p className="text-red-500 mt-4">{error}</p>}
+                {videoError && <p className="text-red-500 mt-4">{videoError}</p>}
+                {videoUrl && !videoError && (
+                    <div className="video-player mt-4">
+                        <br />
+                        <hr />
+                        <br />
+                        <video ref={videoRef} controls style={{ width: '100%', borderRadius: '1rem', border: '1px solid grey' }}>
+                            <source src={videoUrl} type="video/mp4" />
+                            Votre navigateur ne supporte pas la balise vidéo.
+                        </video>
+                    </div>
                 )}
-                <button onClick={() => setIsModalOpen(false)} className="close-modal-button">X</button>
-            </Modal>
-
-
-            <br />
-        </div>
+            </div>
         </div>
     );
 };
