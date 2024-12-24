@@ -376,14 +376,6 @@ app.get('/video/:channelId/hls', async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
 // Récupération des vidéos par détection de véhicules
 app.get('/api/videos/vehicle', async (req, res) => {
     try {
@@ -447,27 +439,6 @@ app.get('/api/videos/vehicle', async (req, res) => {
     }
 });
 
-
-app.get('/proxy-image', async (req, res) => {
-    const { imageUrl } = req.query;
-    if (!imageUrl) {
-        return res.status(400).send('Image URL manquante.');
-    }
-
-    try {
-        const response = await digestAuth.request({
-            method: 'GET',
-            url: imageUrl,
-            responseType: 'arraybuffer',
-        });
-
-        res.set('Content-Type', response.headers['content-type']);
-        res.send(response.data);
-    } catch (error) {
-        console.error('Erreur lors de la récupération de l\'image:', error);
-        res.status(500).send('Erreur lors de la récupération de l\'image.');
-    }
-});
 
 
 
@@ -582,6 +553,9 @@ app.get('/video-event/:channelId', async (req, res) => {
 });
 
 
+
+
+//Photos par détéction de vehicule
 app.get('/api/photos/vehicle', async (req, res) => {
     try {
         let { cameraId, startTime, endTime } = req.query;
@@ -664,11 +638,105 @@ app.get('/api/photos/vehicle', async (req, res) => {
         res.status(500).json({ error: 'Erreur interne du serveur', details: error.message });
     }
 });
+app.get('/proxy-image', async (req, res) => {
+    const { imageUrl } = req.query;
+    if (!imageUrl) {
+        return res.status(400).send('Image URL manquante.');
+    }
 
+    try {
+        const response = await digestAuth.request({
+            method: 'GET',
+            url: imageUrl,
+            responseType: 'arraybuffer',
+        });
+
+        res.set('Content-Type', response.headers['content-type']);
+        res.send(response.data);
+    } catch (error) {
+        console.error('Erreur lors de la récupération de l\'image:', error);
+        res.status(500).send('Erreur lors de la récupération de l\'image.');
+    }
+});
 
 
 
   
+// Vidéos par détection de vehicule
+app.get('/api/videos/vehicle', async (req, res) => {
+    try {
+        let { cameraId, startTime, endTime } = req.query;
+
+        if (!cameraId || !startTime || !endTime) {
+            return res.status(400).json({ error: 'Les paramètres cameraId, startTime et endTime sont requis' });
+        }
+
+        // Préparation du corps de la requête
+        const searchBody = {
+            SearchDescription: {
+                searchID: "29344AF2-FA6F-4CE2-8BB1-668A4FCD67DA",
+                searchResultPosition: 0,
+                maxResults: 100,
+                SearchCondList: [
+                    {
+                        channelID: cameraId,
+                        targetTypes: ["human"],
+                        searchTimeList: [
+                            {
+                                searchTime: {
+                                    startTime,
+                                    endTime,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
+
+        console.log('Requête JSON :', JSON.stringify(searchBody, null, 2));
+
+        // Envoi de la requête à l'API
+        const response = await digestAuth.request({
+            url: `http://${process.env.RTSP_HOST}:80/ISAPI/ContentMgmt/SearchByTargetType`,
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            data: searchBody,
+        });
+
+        console.log('Réponse ISAPI :', response.data);
+
+        // Traitement de la réponse
+        const searchResult = response.data?.SearchResult;
+        if (!searchResult || searchResult.numOfMatches === 0) {
+            return res.json({ videos: [] });
+        }
+
+        // Extraction des données des vidéos
+        const videos = searchResult.matchList.flatMap((match) => {
+            const channelID = match.channelID;
+            const targetTypes = match.targetTypes;
+            return match.RecordInfoList.map((record) => {
+                const startTime = record.RecordTime.startTime;
+                const endTime = record.RecordTime.endTime;
+
+                return {
+                    channelID,
+                    targetTypes,
+                    startTime,
+                    endTime,
+                };
+            });
+        });
+
+        res.json({ videos });
+        console.log(videos);
+    } catch (error) {
+        console.error('Erreur lors de la récupération des vidéos :', error);
+        res.status(500).json({ error: 'Erreur interne du serveur', details: error.message });
+    }
+});
+
 module.exports = app;
 
 

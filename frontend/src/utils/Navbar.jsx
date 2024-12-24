@@ -35,7 +35,7 @@ const Navbar = () => {
                     <Link to="/cameras" className="hover:bg-green-600 px-3 py-2 rounded">Caméras</Link>
                     <Link to="/history" className="hover:bg-green-600 px-3 py-2 rounded">Vidéos</Link>
                     <Link to="/videos" className="hover:bg-green-600 px-3 py-2 rounded">Stream</Link>
-                    <Link to="/vehiclePhoto" className="hover:bg-green-600 px-3 py-2 rounded">Voitures</Link>
+                    <Link to="/vehiclePhoto" className="hover:bg-green-600 px-3 py-2 rounded">Vehicule</Link>
                 </nav>
 
                 {/* Logo de profil à droite */}
@@ -73,6 +73,7 @@ const Navbar = () => {
                         <Link to="/cameras" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Caméras</Link>
                         <Link to="/history" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Vidéos</Link>
                         <Link to="/videos" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Stream</Link>
+                        <Link to="/vehiclePhoto" className="block text-white hover:bg-green-600 px-4 py-2 rounded">Vehicule</Link>
                         <hr />
                         {isAuthenticated && (
                             <div className="mt-4">

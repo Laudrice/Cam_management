@@ -139,13 +139,13 @@ const VehiclePhotos = () => {
         <div className="p-4 bg-green-50">
             <div className="block p-6 bg-white border border-gray-200 rounded-lg shadow-lg" style={{ width: '90%', margin: 'auto' }}>
                 <div className="flex" style={{ justifyContent: 'space-between' }}>
-                    <h1 className="text-2xl font-bold mb-4">Photos Véhicule</h1>
+                    <h1 className="text-2xl font-bold mb-4">Détection de véhicule</h1>
                 </div>
                 <br />
                 <hr />
                 <br />
                 <div className="search-controls">
-                    <label htmlFor="cameraSelect" className="mr-4">Sélectionner une caméra :</label>
+                    <label htmlFor="cameraSelect" className="mr-4">Sélectionner une caméra Hik:</label>
                     <select
                         value={selectedCamera}
                         onChange={(e) => setSelectedCamera(e.target.value)}
@@ -196,9 +196,18 @@ const VehiclePhotos = () => {
                                             <FontAwesomeIcon icon={faClock} className="mr-2"/> <b>{time}</b>
                                         </div>
                                     </div>
+                                    <hr />
                                     <button
-                                        onClick={() => handleStreamVideo(photo.startTime)}
-                                        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+                                        onClick={() => {
+                                            handleStreamVideo(photo.startTime);
+                                            // Défilement vers le bas de la page
+                                            window.scrollTo({
+                                                top: document.body.scrollHeight, // Descendre jusqu'au bas de la page
+                                                behavior: 'smooth', // Ajouter un effet de défilement fluide
+                                            });
+                                        }}
+                                        className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 my-2"
+                                        style={{'alignItems':'center', 'marginLeft':'30%'}}
                                     >
                                         Voir la vidéo
                                     </button>
@@ -237,6 +246,32 @@ const VehiclePhotos = () => {
                     </div>
                 )}
             </div>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
         </div>
     );
 };
