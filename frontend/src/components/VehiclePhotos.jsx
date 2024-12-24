@@ -200,10 +200,9 @@ const VehiclePhotos = () => {
                                     <button
                                         onClick={() => {
                                             handleStreamVideo(photo.startTime);
-                                            // Défilement vers le bas de la page
                                             window.scrollTo({
-                                                top: document.body.scrollHeight, // Descendre jusqu'au bas de la page
-                                                behavior: 'smooth', // Ajouter un effet de défilement fluide
+                                                top: document.body.scrollHeight, 
+                                                behavior: 'smooth', 
                                             });
                                         }}
                                         className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 my-2"
