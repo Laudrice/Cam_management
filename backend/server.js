@@ -226,7 +226,7 @@ app.get('/video-history/:channelId', async (req, res) => {
     const formattedEndTime = formatRTSPDate(adjustedEndTime);
 
     const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
-    console.log(`Requête: ${rtspUrl}`);
+    console.log(`Requête: ${rtspUrl}`); 
 
     try {
         const duration = await getVideoDuration(rtspUrl);
