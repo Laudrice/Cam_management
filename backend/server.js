@@ -211,12 +211,23 @@ async function getVideoResolution(rtspUrl) {
     });
 }
 
+const ffmpegProcesses = new Map();
+
 app.get('/video-history/:channelId', async (req, res) => {
     const { channelId } = req.params;
     const { startTime, endTime } = req.query;
 
+    // channelId = channelId + 1;
+
     if (!startTime || !endTime) {
-        return res.status(400).json({ error: 'Date obligatoire' });
+        return res.status(400).json({ error: 'Les dates sont obligatoires' });
+    }
+
+    // Arrêter le processus FFmpeg existant pour ce channelId
+    if (ffmpegProcesses.has(channelId)) {
+        const existingProcess = ffmpegProcesses.get(channelId);
+        existingProcess.kill('SIGINT');
+        ffmpegProcesses.delete(channelId);
     }
 
     const adjustedStartTime = new Date(new Date(startTime).getTime() + 2 * 60 * 60 * 1000);
@@ -226,21 +237,8 @@ app.get('/video-history/:channelId', async (req, res) => {
     const formattedEndTime = formatRTSPDate(adjustedEndTime);
 
     const rtspUrl = `rtsp://${process.env.RTSP_USERNAME}:${process.env.RTSP_PASSWORD}@${process.env.RTSP_HOST}:${process.env.RTSP_PORT}/ISAPI/streaming/tracks/${channelId}?starttime=${formattedStartTime}&endtime=${formattedEndTime}`;
-    console.log(`Requête: ${rtspUrl}`); 
+    console.log(`Requête: ${rtspUrl}`);
 
-    try {
-        const duration = await getVideoDuration(rtspUrl);
-        console.log(`Durée de la vidéo: ${duration} seconds`);
-    } catch (error) {
-        console.error(`Cidéo introuvable: ${error.message}`);
-        return res.status(500).json({ error: 'Vidéo introuvable' });
-    }
-
-    res.writeHead(200, {
-        'Content-Type': 'video/mp4',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-    });
     const ffmpegArgs = [
         '-rtsp_transport', 'tcp',
         '-fflags', '+genpts',
@@ -258,21 +256,30 @@ app.get('/video-history/:channelId', async (req, res) => {
 
     const ffmpegProcess = spawn('ffmpeg', ffmpegArgs);
 
+    ffmpegProcesses.set(channelId, ffmpegProcess);
+
+    res.writeHead(200, {
+        'Content-Type': 'video/mp4',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+    });
+
     ffmpegProcess.stdout.pipe(res);
 
     ffmpegProcess.stderr.on('data', (data) => {
         console.error(`FFmpeg stderr: ${data}`);
     });
 
-    ffmpegProcess.on('error', (err) => {
-        console.error(`FFmpeg process error: ${err.message}`);
-        res.status(500).end();
+    ffmpegProcess.on('close', () => {
+        ffmpegProcesses.delete(channelId);
     });
 
     req.on('close', () => {
         ffmpegProcess.kill('SIGINT');
+        ffmpegProcesses.delete(channelId);
     });
 });
+
 
 
 app.get('/save-video/:channelId', async (req, res) => {

@@ -13,6 +13,8 @@ import VideoHistoryPage from './components/VideoHistoryPage';
 import VideoSearchPage from './components/VideoSearchPage';
 import VehiclePhotos from './components/VehiclePhotos';
 import VehicleVideos from './components/VehicleVideos';
+import VideoPlayBack from './components/VideoPlayBack';
+import VideoPlayBackPage from './components/VideoPlayBackPage';
 
 const App = () => {
 
@@ -55,6 +57,7 @@ const App = () => {
                 <Route path="/profile" element={<ProtectedRoute component={Profile} />} />
                 <Route path="/cameras" element={<ProtectedRoute component={CameraManagement} />} />
                 <Route path="/history" element={<ProtectedRoute component={VideoHistoryPage} />} />
+                <Route path="/playback" element={<ProtectedRoute component={VideoPlayBackPage} />} />
                 <Route path="/videos" element={<ProtectedRoute component={CameraList} />} />
                 {/* <Route path="/events" element={<ProtectedRoute component={VideoSearchPage} />} /> */}
                 <Route path="/vehiclePhoto" element={<ProtectedRoute component={VehiclePhotos} />} />
