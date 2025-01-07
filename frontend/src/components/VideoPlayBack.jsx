@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { DataSet, Timeline } from 'vis-timeline/standalone';
+import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 import moment from 'moment';
-import { ThreeDots } from 'react-loader-spinner';
 
 const VideoPlayBack = ({ channelId }) => {
     const [startTime, setStartTime] = useState(moment().subtract(1, 'hour').format('YYYY-MM-DDTHH:mm'));
@@ -8,35 +9,91 @@ const VideoPlayBack = ({ channelId }) => {
     const [videoUrl, setVideoUrl] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [playbackRate, setPlaybackRate] = useState(1);
-    const [currentProgress, setCurrentProgress] = useState(0); // Progress in seconds
+    const [showTimeline, setShowTimeline] = useState(false); // Pour afficher ou masquer la timeline
     const videoRef = useRef(null);
+    const timelineRef = useRef(null); // Référence pour le conteneur de la timeline
 
-    // Calculate total duration in seconds
-    const totalDuration = moment(endTime).diff(moment(startTime), 'seconds');
+    useEffect(() => {
+        if (showTimeline) {
+            const container = timelineRef.current;
+
+            // Définissez les items de la timeline
+            const items = new DataSet([
+                {
+                    id: 1,
+                    content: 'Début',
+                    start: moment(startTime).toISOString(),
+                },
+                {
+                    id: 2,
+                    content: 'Fin',
+                    start: moment(endTime).toISOString(),
+                },
+            ]);
+
+            // Configurez les options de la timeline
+            const options = {
+                start: moment(startTime).toISOString(),
+                end: moment(endTime).toISOString(),
+                min: moment(startTime).toISOString(), // Limite de scroll minimale
+                max: moment(endTime).toISOString(), // Limite de scroll maximale
+                zoomMin: 1000 * 60, // Zoom minimum (1 minute)
+                zoomMax: 1000 * 60 * 60 * 24, // Zoom maximum (1 jour)
+                selectable: true,
+                editable: false,
+                margin: { item: 10 },
+                format: {
+                    minorLabels: {
+                        minute: 'HH:mm',
+                    },
+                    majorLabels: {
+                        hour: 'YYYY-MM-DD HH:mm',
+                    },
+                },
+            };
+
+            // Initialisez la timeline
+            if (container) {
+                const timeline = new Timeline(container, items, options);
+
+                // Gérer les clics sur la timeline
+                timeline.on('click', (event) => {
+                    if (event.time) {
+                        // Récupérez le timestamp cliqué
+                        const selectedTime = moment(event.time).format('YYYY-MM-DDTHH:mm:ss');
+                        console.log('Temps sélectionné:', selectedTime);
+
+                        // Requêter la vidéo à partir de ce moment
+                        handleStreamVideo(selectedTime);
+                    }
+                });
+            }
+        }
+    }, [showTimeline, startTime, endTime]);
 
     const handleStreamVideo = async (newStartTime) => {
         setError('');
         setLoading(true);
-    
+
         const streamStart = newStartTime || startTime;
         const streamUrl = `http://localhost:8080/video-history/${channelId}?startTime=${streamStart}&endTime=${endTime}`;
-    
+
         try {
             const response = await fetch(streamUrl);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Échec de la récupération de la vidéo');
             }
-    
+
             setVideoUrl(streamUrl);
-            
-            // Attendez que la vidéo soit prête
+
+            // Configurez la vidéo avec la position sélectionnée
             if (videoRef.current) {
                 videoRef.current.pause();
-                videoRef.current.load(); // Recharge la nouvelle source vidéo
+                videoRef.current.load();
                 videoRef.current.onloadedmetadata = () => {
-                    videoRef.current.currentTime = moment(newStartTime).diff(moment(startTime), 'seconds'); // Met à jour la position
+                    const timeInSeconds = moment(newStartTime).diff(moment(startTime), 'seconds');
+                    videoRef.current.currentTime = timeInSeconds;
                     videoRef.current.play();
                 };
             }
@@ -48,23 +105,11 @@ const VideoPlayBack = ({ channelId }) => {
             setLoading(false);
         }
     };
-    
 
-    const handleProgressClick = (e) => {
-        const progressBar = e.target;
-        const clickPosition = e.nativeEvent.offsetX;
-        const progressBarWidth = progressBar.offsetWidth;
-        const clickedPercent = clickPosition / progressBarWidth;
-        const newTimeInSeconds = Math.floor(clickedPercent * totalDuration);
-        const newStartTime = moment(startTime).add(newTimeInSeconds, 'seconds').format('YYYY-MM-DDTHH:mm:ss');
-        
-        setCurrentProgress(newTimeInSeconds);
-    
-        // Déclenchez la navigation à la position sélectionnée
-        handleStreamVideo(newStartTime);
+    const handleSearch = () => {
+        setShowTimeline(true); // Afficher la timeline après la recherche
+        handleStreamVideo();
     };
-    
-    
 
     return (
         <div className="video-history-container">
@@ -93,13 +138,13 @@ const VideoPlayBack = ({ channelId }) => {
             </div>
             <div className="flex gap-4">
                 <button
-                    onClick={() => handleStreamVideo()}
+                    onClick={handleSearch}
                     className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
                 >
-                    Voir la vidéo
+                    Rechercher vidéo
                 </button>
             </div>
-            
+
             {videoUrl && !error && (
                 <div className="video-player mt-4">
                     <video
@@ -112,28 +157,25 @@ const VideoPlayBack = ({ channelId }) => {
                         <source src={videoUrl} type="video/mp4" />
                         Votre navigateur ne supporte pas la balise vidéo.
                     </video>
-                                            
-                    <div
-                        className="progress-bar mt-4 bg-gray-300 rounded-full h-2 relative cursor-pointer"
-                        style={{ width: '100%' }}
-                        onClick={handleProgressClick}
-                    >
-                        <div
-                            className="progress bg-blue-500 h-2 rounded-full absolute"
-                            style={{ width: `${(currentProgress / totalDuration) * 100}%` }}
-                        ></div>
-                    </div>
-                    <p className="mt-2 text-sm">
-                        {moment(startTime).add(currentProgress, 'seconds').format('YYYY-MM-DD HH:mm:ss')} /{' '}
-                        {moment(endTime).format('YYYY-MM-DD HH:mm:ss')}
-                    </p>
                 </div>
             )}
+
+            {showTimeline && (
+                <div className="timeline-container mt-4">
+                    <h4 className="text-lg font-bold">Timeline</h4>
+                    <div
+                        ref={timelineRef}
+                        style={{ height: '200px', border: '1px solid #ccc', backgroundColor: '#f9f9f9' }}
+                    ></div>
+                </div>
+            )}
+
             {loading && (
                 <div className="flex justify-center items-center mt-4">
-                    <ThreeDots color="#15803d" height={80} width={80} />
+                    <p>Chargement...</p>
                 </div>
             )}
+
             {error && <p className="text-red-500 mt-4">{error}</p>}
         </div>
     );
