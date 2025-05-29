@@ -136,12 +136,12 @@ const VideoHistory = ({ channelId }) => {
                 </div>
             </div>
             <div className="flex gap-4">
-                <button
+                {/* <button
                     onClick={handleStreamVideo}
                     className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
                 >
                     Voir la vidéo
-                </button>
+                </button> */}
                 <button
                     onClick={handleDownloadVideo}
                     className="bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
@@ -150,7 +150,8 @@ const VideoHistory = ({ channelId }) => {
                 </button>
             </div>
             {loading && (
-                <div className="flex justify-center items-center mt-4">
+                <div className="flex justify-center items-center mt-4" style={{flexDirection:"column"}}>
+                    <p> <b>Téléchargement en cours, veuillez patienter </b></p>
                     <ThreeDots color="#15803d" height={80} width={80} />
                 </div>
             )}
@@ -184,8 +185,8 @@ const VideoHistory = ({ channelId }) => {
                     <option value="4">4x</option>
                     <option value="8">8x</option>
                     <option value="16">16x</option>
-                    <option value="32">32x</option>
-                    <option value="64">64x</option>
+                    {/* <option value="32">32x</option>
+                    <option value="64">64x</option> */}
                 </select>
             </div>
 

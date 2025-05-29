@@ -33,7 +33,7 @@ const Navbar = () => {
                     <Link to="/" className="hover:bg-green-600 px-3 py-2 rounded">Accueil</Link>
                     <Link to="/users" className="hover:bg-green-600 px-3 py-2 rounded">Utilisateurs</Link>
                     <Link to="/cameras" className="hover:bg-green-600 px-3 py-2 rounded">Caméras</Link>
-                    <Link to="/history" className="hover:bg-green-600 px-3 py-2 rounded">Vidéos</Link>
+                    <Link to="/playback" className="hover:bg-green-600 px-3 py-2 rounded">Vidéos</Link>
                     <Link to="/videos" className="hover:bg-green-600 px-3 py-2 rounded">Stream</Link>
                     <Link to="/vehiclePhoto" className="hover:bg-green-600 px-3 py-2 rounded">Vehicule</Link>
                 </nav>

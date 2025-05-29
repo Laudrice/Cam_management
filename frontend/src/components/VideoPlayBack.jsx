@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DataSet, Timeline } from 'vis-timeline/standalone';
+import { Link } from 'react-router-dom';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 import moment from 'moment';
 
@@ -9,15 +10,21 @@ const VideoPlayBack = ({ channelId }) => {
     const [videoUrl, setVideoUrl] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [showTimeline, setShowTimeline] = useState(false); // Pour afficher ou masquer la timeline
+    const [showTimeline, setShowTimeline] = useState(false);
     const videoRef = useRef(null);
-    const timelineRef = useRef(null); // Référence pour le conteneur de la timeline
+    const timelineRef = useRef(null);
+    const timelineInstance = useRef(null); // Stockage de l'instance de la timeline
 
     useEffect(() => {
         if (showTimeline) {
             const container = timelineRef.current;
 
-            // Définissez les items de la timeline
+            // Détruire l'ancienne timeline si elle existe
+            if (timelineInstance.current) {
+                timelineInstance.current.destroy();
+                timelineInstance.current = null;
+            }
+
             const items = new DataSet([
                 {
                     id: 1,
@@ -35,9 +42,9 @@ const VideoPlayBack = ({ channelId }) => {
             const options = {
                 start: moment(startTime).toISOString(),
                 end: moment(endTime).toISOString(),
-                min: moment(startTime).toISOString(), // Limite de scroll minimale
+                min: moment(startTime).toISOString(),
                 max: moment(endTime).toISOString(), // Limite de scroll maximale
-                zoomMin: 1000 * 60, // Zoom minimum (1 minute)
+                zoomMin: 1000 * 60 * 5,
                 zoomMax: 1000 * 60 * 60 * 24, // Zoom maximum (1 jour)
                 selectable: true,
                 editable: false,
@@ -52,12 +59,12 @@ const VideoPlayBack = ({ channelId }) => {
                 },
             };
 
-            // Initialisez la timeline
+            // Initialisez la nouvelle timeline
             if (container) {
-                const timeline = new Timeline(container, items, options);
+                timelineInstance.current = new Timeline(container, items, options);
 
                 // Gérer les clics sur la timeline
-                timeline.on('click', (event) => {
+                timelineInstance.current.on('click', (event) => {
                     if (event.time) {
                         // Récupérez le timestamp cliqué
                         const selectedTime = moment(event.time).format('YYYY-MM-DDTHH:mm:ss');
@@ -152,6 +159,7 @@ const VideoPlayBack = ({ channelId }) => {
                         autoPlay
                         muted
                         loop
+                        playsinline
                         style={{ width: '100%', border: '1px solid grey', backgroundColor: '#525151' }}
                     >
                         <source src={videoUrl} type="video/mp4" />
@@ -162,21 +170,21 @@ const VideoPlayBack = ({ channelId }) => {
 
             {showTimeline && (
                 <div className="timeline-container mt-4">
-                    <h4 className="text-lg font-bold">Timeline</h4>
+                    <h4 className="text-lg font-bold">Progression</h4>
                     <div
                         ref={timelineRef}
-                        style={{ height: '200px', border: '1px solid #ccc', backgroundColor: '#f9f9f9' }}
+                        style={{ height: '100px', border: '1px solid #ccc', backgroundColor: '#f9f9f9' }}
                     ></div>
                 </div>
             )}
-
             {loading && (
                 <div className="flex justify-center items-center mt-4">
                     <p>Chargement...</p>
                 </div>
             )}
-
+            <br />
             {error && <p className="text-red-500 mt-4">{error}</p>}
+            <br />
         </div>
     );
 };

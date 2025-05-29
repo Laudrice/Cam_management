@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import VideoHistory from './VideoHistory';
 import axios from '../axiosConfig';
 import VideoPlayBack from './VideoPlayBack';
+import { Link } from 'react-router-dom';
+
 
 const VideoPlayBackPage = () => {
     const [cameras, setCameras] = useState([]);
@@ -48,6 +50,11 @@ const VideoPlayBackPage = () => {
                 </div>
                 <br />
                 <hr />
+                <br />
+                <Link to="/history" className="bg-green-600 px-3 py-2 rounded hover:bg-green-600 px-3 py-2 rounded float-right" style={{color: 'white'}}>Ouvrir la page de téléchargement et de lecture local</Link>
+                
+                <br />
+                <br />
                 <br />
                 <div className="mb-4 flex items-center">
                     <label htmlFor="cameraSelect" className="mr-4">Sélectionner une caméra :</label>

@@ -43,7 +43,7 @@ const VideoHistoryPage = () => {
         <div className="p-4 bg-green-50">
             <div className="block p-6 bg-white border border-gray-200 rounded-lg shadow-lg" style={{ width: '90%', margin: 'auto' }}>
                 <div className="flex" style={{ justifyContent: 'space-between' }}>
-                    <h1 className="text-2xl font-bold mb-4">Recherche d'une vidéo</h1>
+                    <h1 className="text-2xl font-bold mb-4">Téléchargement et visionnage de vidéo locale</h1>
                 </div>
                 <br />
                 <hr />

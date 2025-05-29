@@ -1,35 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import image from './image.png'; // Importer l'image depuis le même dossier
 
 const Home = () => {
-    const [cameras, setCameras] = useState([]);
-
     useEffect(() => {
-        fetch('/api/cameras')
-            .then(response => response.json())
-            .then(data => setCameras(data))
-            .catch(err => console.error(err));
-    }, []);
+        // Désactiver le scroll en ajoutant un style
+        document.body.style.overflow = 'hidden';
 
+        // Réactiver le scroll lorsqu'on quitte le composant
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, []);
     return (
-        <div className="container mx-auto p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {cameras.map((camera, index) => (
-                    <div key={index} className="bg-black p-2 rounded-lg shadow-lg">
-                        <h2 className="text-white text-center mb-2">{camera.cam_name}</h2>
-                        <div className="relative h-0" style={{ paddingBottom: '56.25%' }}>
-                            {/* Placeholder pour la vidéo. Remplacez src par l'URL réelle du flux */}
-                            <iframe
-                                className="absolute top-0 left-0 w-full h-full"
-                                src={`https://${camera.cam_IP}:${camera.cam_port}/live`}
-                                frameBorder="0"
-                                allow="autoplay; encrypted-media"
-                                allowFullScreen
-                                title={camera.cam_name}
-                            ></iframe>
-                        </div>
-                    </div>
-                ))}
-            </div>
+        <div
+            style={{
+                backgroundImage: `url(${image})`, // Utiliser l'image importée
+                backgroundSize: 'cover', // L'image couvre tout le conteneur
+                backgroundPosition: 'center', // Centrer l'image
+                backgroundRepeat: 'no-repeat', // Empêcher la répétition
+                height: '100vh', // Hauteur de la vue complète
+                width: '100%', // Largeur de la page
+            }}
+        >
+            {/* Contenu de la page */}
+            {/* <div
+                style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Overlay sombre
+                    color: 'white', // Texte blanc pour contraste
+                    padding: '20px',
+                    textAlign: 'center',
+                }}
+            >
+                <h1>Bienvenue sur la page d'accueil</h1>
+                <p>Profitez de notre interface moderne et intuitive.</p>
+            </div> */}
         </div>
     );
 };
