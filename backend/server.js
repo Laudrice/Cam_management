@@ -111,6 +111,18 @@ app.get('/cameras', async (req, res) => {
     }
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
 // Route pour le streaming en basse qualité
 app.get('/stream-lowest/:channelId', (req, res) => {
     const channelId = req.params.channelId;
@@ -310,8 +322,8 @@ app.get('/save-video/:channelId', async (req, res) => {
 
     const ffmpegProcess = ffmpeg(rtspUrl)
         .setFfmpegPath(ffmpegPath)
-        .inputOptions('-rtsp_transport', 'tcp')  // Utiliser TCP
-        .inputOptions('-buffer_size', '10000000')  // Taille du buffer
+        .inputOptions('-rtsp_transport', 'tcp')
+        .inputOptions('-buffer_size', '10000000')
         .outputOptions('-c:v', 'libx264')
         .outputOptions('-preset', 'veryfast')
         .outputOptions('-threads', '0')
