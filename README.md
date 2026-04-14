@@ -18,7 +18,7 @@ Dépendances clés
 
 Variables d'environnement (backend)
 
-Créez un fichier `.env` dans `backend/` contenant au minimum :
+Créez un fichier `.env` dans `backend/` contenant :
 
 - `RTSP_HOST` (adresse du NVR)
 - `RTSP_PORT` (port RTSP)
