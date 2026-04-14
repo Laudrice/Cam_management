@@ -112,17 +112,6 @@ app.get('/cameras', async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
 // Route pour le streaming en basse qualité
 app.get('/stream-lowest/:channelId', (req, res) => {
     const channelId = req.params.channelId;
@@ -331,8 +320,8 @@ app.get('/save-video/:channelId', async (req, res) => {
         .outputOptions('-an')
         .outputOptions('-movflags', '+faststart')
         .outputOptions('-t', durationInSeconds)
-        .outputOptions('-s', '1280x720')  // Réduire la résolution
-        .outputOptions('-b:v', '1M')  // Réduire le débit binaire
+        .outputOptions('-s', '1280x720')  // Resolution video
+        .outputOptions('-b:v', '1M')
         .outputOptions('-maxrate', '1.5M')
         .outputOptions('-bufsize', '3M')
         .save(outputFilePath);
@@ -457,9 +446,6 @@ app.get('/api/videos/vehicle', async (req, res) => {
         res.status(500).json({ error: 'Erreur de récupération des vidéos' });
     }
 });
-
-
-
 
 
 // Récupération des vidéos par détection de mouvement
@@ -759,9 +745,7 @@ app.get('/api/videos/vehicle', async (req, res) => {
 module.exports = app;
 
 
-
-
-// Démarrer le serveur
+// Démarrage
 app.listen(PORT, () => {
     console.log(`Serveur actif sur le port ${PORT}`);
 });
